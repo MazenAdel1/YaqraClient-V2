@@ -48,6 +48,18 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+@theme {
+  /* custom styles */
+  --color-white: #f3f3f3;
+  --color-dark-gray: #151515;
+  --color-mid-gray: #1b1b1b;
+  --color-light-gray: #2c2c2c;
+  --color-green: #37b722;
+  --color-red: #b73422;
+  --color-brown: #a44d1d;
+  --animate-fade-in: fade-in 0.2s ease-out both;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.147 0.004 49.25);
@@ -117,14 +129,21 @@
   --sidebar-ring: oklch(0.553 0.013 58.071);
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
+@utility container {
+  @apply mx-auto px-2;
+}
+
+button {
+  @apply cursor-pointer;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    scale: 0.95;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
+  to {
+    opacity: 1;
+    scale: 1;
   }
 }
