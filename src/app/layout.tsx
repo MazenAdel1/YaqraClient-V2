@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { DirectionProvider } from "@base-ui/react";
 import localFont from "next/font/local";
+import { UserStoreProvider } from "@/providers/user-store-provider";
 
 const fontSans = Noto_Sans_Arabic({
   subsets: ["arabic", "latin"],
@@ -70,10 +71,14 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={cn("font-sans", fontSans.className, YOC.variable)}
+      className={cn("dark font-sans", fontSans.className, YOC.variable)}
     >
-      <body className={`${geistSans.variable} antialiased`}>
-        <DirectionProvider direction="rtl">{children}</DirectionProvider>
+      <body
+        className={`${geistSans.variable} bg-dark-gray min-h-dvh text-white antialiased`}
+      >
+        <DirectionProvider direction="rtl">
+          <UserStoreProvider>{children}</UserStoreProvider>
+        </DirectionProvider>
       </body>
     </html>
   );
