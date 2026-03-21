@@ -6,8 +6,8 @@ export default async function layout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-dvh items-center justify-center">
-      <div className="flex flex-col items-center justify-center gap-10">
+    <main className="flex min-h-dvh w-full items-center justify-center px-4">
+      <div className="flex w-full flex-col items-center justify-center gap-10">
         <Image
           src="/logo.svg"
           loading="eager"
