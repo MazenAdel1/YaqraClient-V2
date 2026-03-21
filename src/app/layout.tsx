@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { DirectionProvider } from "@base-ui/react";
 import localFont from "next/font/local";
 import { UserStoreProvider } from "@/providers/user-store-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = Noto_Sans_Arabic({
   subsets: ["arabic", "latin"],
@@ -77,7 +78,10 @@ export default function RootLayout({
         className={`${geistSans.variable} bg-dark-gray min-h-dvh text-white antialiased`}
       >
         <DirectionProvider direction="rtl">
-          <UserStoreProvider>{children}</UserStoreProvider>
+          <UserStoreProvider>
+            {children}
+            <Toaster />
+          </UserStoreProvider>
         </DirectionProvider>
       </body>
     </html>
