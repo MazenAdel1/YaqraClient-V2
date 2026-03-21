@@ -57,7 +57,6 @@
   --color-green: #37b722;
   --color-red: #b73422;
   --color-brown: #a44d1d;
-  --animate-fade-in: fade-in 0.2s ease-out both;
 }
 
 :root {
@@ -133,17 +132,7 @@
   @apply mx-auto px-2;
 }
 
-button {
-  @apply cursor-pointer;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    scale: 0.95;
-  }
-  to {
-    opacity: 1;
-    scale: 1;
-  }
+button,
+a {
+  @apply cursor-pointer!;
 }
