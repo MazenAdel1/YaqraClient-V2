@@ -23,8 +23,17 @@ export default function Form<S extends AnyObjectSchema>({
 
   return (
     <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
+      onSubmit={form.handleSubmit(async (e) => {
+        try {
+          await onSubmit(e);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          form.setError("root", {
+            message: error.response?.data?.message || error.response?.message,
+          });
+        }
+      })}
+      className="flex w-full flex-col gap-4"
     >
       {inputs.map((input) => (
         <Controller
@@ -32,7 +41,7 @@ export default function Form<S extends AnyObjectSchema>({
           name={input.name}
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="min-w-80">
+            <Field data-invalid={fieldState.invalid} className="w-full">
               <FieldLabel htmlFor={String(input.name)}>
                 {input.label}
               </FieldLabel>
@@ -56,6 +65,12 @@ export default function Form<S extends AnyObjectSchema>({
           )}
         />
       ))}
+
+      {form.formState.errors.root && (
+        <div className="text-destructive text-sm">
+          {form.formState.errors.root.message}
+        </div>
+      )}
 
       <Button
         type="submit"
