@@ -36,7 +36,7 @@ export default function LoginForm() {
       picture: userData.result.profilePicture,
       bio: userData.result.bio,
       followersCount: userData.result.followersCount,
-      followingCount: userData.result.followingCount,
+      followingsCount: userData.result.followingsCount,
     });
 
     toast.success("تم تسجيل الدخول بنجاح");
