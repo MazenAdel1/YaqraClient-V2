@@ -9,11 +9,11 @@ export type UserState = Partial<{
   picture: string;
   bio: string;
   followersCount: number;
-  followingCount: number;
+  followingsCount: number;
 }>;
 
 export type UserActions = {
-  updateUser: (user: Partial<UserState>) => void;
+  updateUser: (user: Partial<UserState> | null) => void;
 };
 
 export type UserStore = UserState & UserActions;
