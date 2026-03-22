@@ -10,13 +10,13 @@ import {
   useState,
 } from "react";
 import { type UserState } from "@/stores/user-store";
-import { getUserId } from "@/lib/utils";
-import { axios } from "@/lib/axios";
-import { getAuthToken } from "@/lib/utils";
+import { getAuthToken, getUserId, getUserRoles } from "@/lib/utils";
+import { axios, refreshAuthSession } from "@/lib/axios";
 
 type UserStoreContextValue = {
   user: UserState | null;
-  updateUser: (user: UserState) => void;
+  isHydratingUser: boolean;
+  updateUser: (user: UserState | null) => void;
 };
 
 const UserStoreContext = createContext<UserStoreContextValue | undefined>(
@@ -29,36 +29,89 @@ export type UserStoreProviderProps = {
 
 export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
   const [user, setUser] = useState<UserState | null>(null);
+  const [isHydratingUser, setIsHydratingUser] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     (async () => {
-      const token = await getAuthToken();
+      try {
+        let session: Awaited<ReturnType<typeof refreshAuthSession>> | null =
+          null;
+        const storedToken = await getAuthToken();
 
-      if (!token) {
-        return;
+        try {
+          session = await refreshAuthSession();
+        } catch {
+          session = null;
+        }
+
+        const token = session?.token ?? storedToken;
+
+        if (!token) {
+          if (isMounted) {
+            setUser(null);
+          }
+          return;
+        }
+
+        const userId = getUserId(token);
+        let profileData: {
+          username?: string;
+          profilePicture?: string;
+          bio?: string;
+          followersCount?: number;
+          followingsCount?: number;
+        } | null = null;
+
+        try {
+          const { data } = await axios.get(`/user/user?userId=${userId}`);
+          profileData = data?.result ?? null;
+        } catch {
+          profileData = null;
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        setUser((prevUser) => ({
+          ...prevUser,
+          token,
+          id: userId,
+          username: session?.username ?? profileData?.username,
+          email: session?.email ?? prevUser?.email,
+          roles: Array.isArray(session?.roles)
+            ? (session.roles as UserState["roles"])
+            : ((getUserRoles(token) as UserState["roles"]) ?? prevUser?.roles),
+          picture: profileData?.profilePicture,
+          bio: profileData?.bio,
+          followersCount: profileData?.followersCount,
+          followingsCount: profileData?.followingsCount,
+        }));
+      } catch {
+        if (!isMounted) return;
+        setUser(null);
+      } finally {
+        if (isMounted) {
+          setIsHydratingUser(false);
+        }
       }
-
-      const userId = getUserId(token);
-
-      const { data } = await axios.get(`/user/user?userId=${userId}`);
-      setUser((prevUser) => ({
-        ...prevUser,
-        token,
-        username: data.result.username,
-        picture: data.result.profilePicture,
-        bio: data.result.bio,
-        followersCount: data.result.followersCount,
-        followingCount: data.result.followingCount,
-        id: userId,
-      }));
     })();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const updateUser = useCallback((nextUser: UserState) => {
-    setUser((prevUser) => ({ ...prevUser, ...nextUser }));
+  const updateUser = useCallback((nextUser: UserState | null) => {
+    setUser((prevUser) => (nextUser ? { ...prevUser, ...nextUser } : null));
   }, []);
 
-  const value = useMemo(() => ({ user, updateUser }), [user, updateUser]);
+  const value = useMemo(
+    () => ({ user, isHydratingUser, updateUser }),
+    [user, isHydratingUser, updateUser],
+  );
 
   return (
     <UserStoreContext.Provider value={value}>

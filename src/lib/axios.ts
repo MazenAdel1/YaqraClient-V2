@@ -1,34 +1,29 @@
 import ax, { AxiosError } from "axios";
 import { clearAuthToken, getAuthToken, setAuthToken } from "@/lib/utils";
 
-const baseURL = process.env.NEXT_PUBLIC_SERVER_URL
-  ? `${process.env.NEXT_PUBLIC_SERVER_URL}`
-  : "https://localhost:7282";
+const baseURL = "https://localhost:7282";
 
 export const axios = ax.create({
   baseURL: `${baseURL}/api`,
   timeout: 5000,
+  withCredentials: true,
 });
 
-let refreshTokenRequest: Promise<string | null> | null = null;
+type RefreshSession = {
+  token: string;
+  username?: string;
+  email?: string;
+  roles?: string[];
+};
 
-async function refreshAccessToken() {
+let refreshTokenRequest: Promise<RefreshSession> | null = null;
+
+export async function refreshAuthSession() {
   if (!refreshTokenRequest) {
     refreshTokenRequest = (async () => {
-      const token = await getAuthToken();
-      const { data } = await ax.post(
-        `${baseURL}/api/auth/refreshtoken`,
-        {},
-        token
-          ? {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          : undefined,
-      );
+      const { data } = await axios.get(`/auth/refreshtoken`);
 
-      const nextToken = data?.token ?? null;
+      const nextToken = data?.token;
 
       if (!nextToken || typeof nextToken !== "string") {
         throw new Error(
@@ -37,7 +32,12 @@ async function refreshAccessToken() {
       }
 
       await setAuthToken(nextToken);
-      return nextToken;
+      return {
+        username: data?.username,
+        email: data?.email,
+        roles: data?.roles,
+        token: nextToken,
+      };
     })().finally(() => {
       refreshTokenRequest = null;
     });
@@ -81,11 +81,8 @@ axios.interceptors.response.use(
     originalRequest._retry = true;
 
     try {
-      const nextToken = await refreshAccessToken();
-
-      if (!nextToken) {
-        throw new Error("Missing token after refresh");
-      }
+      const session = await refreshAuthSession();
+      const nextToken = session.token;
 
       originalRequest.headers.set("Authorization", `Bearer ${nextToken}`);
       return axios(originalRequest);
