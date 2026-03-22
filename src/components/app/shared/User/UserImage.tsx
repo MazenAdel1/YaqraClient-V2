@@ -33,7 +33,7 @@ export default function UserImage({ id, innavigable = false }: UserImageProps) {
   const avatar =
     isCurrentUser && profilePicture ? (
       <Image
-        src={profilePicture}
+        src={`${process.env.NEXT_PUBLIC_SERVER_URL}/${profilePicture}`}
         alt="Profile Picture"
         width={40}
         height={40}
@@ -41,7 +41,7 @@ export default function UserImage({ id, innavigable = false }: UserImageProps) {
       />
     ) : userData?.picture ? (
       <Image
-        src={userData.picture}
+        src={`${process.env.NEXT_PUBLIC_SERVER_URL}/${userData.picture}`}
         alt="Profile Picture"
         width={40}
         height={40}

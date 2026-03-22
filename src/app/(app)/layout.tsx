@@ -1,4 +1,4 @@
-import { Header } from "@/components/protected/layout";
+import { Header } from "@/components/app/layout";
 
 export default async function layout({
   children,

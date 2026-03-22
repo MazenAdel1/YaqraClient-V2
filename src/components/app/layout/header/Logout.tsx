@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { clearAuthToken } from "@/lib/utils";
+import { useUserStore } from "@/providers/user-store-provider";
 import { DoorOpen, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { useState } from "react";
 export default function Logout() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { updateUser } = useUserStore();
 
   return (
     <Button
@@ -17,6 +19,7 @@ export default function Logout() {
       onClick={async () => {
         setLoading(true);
         await clearAuthToken();
+        updateUser(null);
         setLoading(false);
         router.replace("/login");
       }}
