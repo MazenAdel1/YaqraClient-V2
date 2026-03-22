@@ -14,8 +14,8 @@ const nextConfig: NextConfig = {
     ],
     dangerouslyAllowLocalIP: true,
   },
-  experimental: {
-    browserDebugInfoInTerminal: true,
+  logging: {
+    browserToTerminal: true,
   },
 };
 
