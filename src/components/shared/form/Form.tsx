@@ -8,6 +8,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import ImagePicker from "./ImagePicker";
 
 export default function Form<S extends AnyObjectSchema>({
   schema,
@@ -15,6 +16,7 @@ export default function Form<S extends AnyObjectSchema>({
   defaultValues,
   onSubmit,
   submitLabel = "ارسال",
+  ref,
 }: FormProps<S>) {
   const form = useForm<z.input<S>, unknown, z.output<S>>({
     resolver: zodResolver(schema),
@@ -23,13 +25,16 @@ export default function Form<S extends AnyObjectSchema>({
 
   return (
     <form
+      ref={ref}
       onSubmit={form.handleSubmit(async (e) => {
         try {
           await onSubmit(e);
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           form.setError("root", {
-            message: error.response?.data?.message || error.response?.message,
+            message:
+              error.response?.data?.message ||
+              error.response?.data.errorMessage,
           });
         }
       })}
@@ -45,21 +50,40 @@ export default function Form<S extends AnyObjectSchema>({
               <FieldLabel htmlFor={String(input.name)}>
                 {input.label}
               </FieldLabel>
-              <Input
-                {...field}
-                id={String(input.name)}
-                type={input.type}
-                placeholder={input.placeholder}
-                aria-label={input.ariaLabel ?? input.label}
-                aria-invalid={fieldState.invalid}
-                value={
-                  typeof field.value === "string" ||
-                  typeof field.value === "number"
-                    ? field.value
-                    : ""
-                }
-                autoFocus={input.autoFocus}
-              />
+              {input.type === "file" ? (
+                <ImagePicker
+                  id={String(input.name)}
+                  name={field.name}
+                  accept={input.accept}
+                  ariaLabel={input.ariaLabel ?? input.label}
+                  value={
+                    field.value instanceof File ||
+                    typeof field.value === "string"
+                      ? field.value
+                      : undefined
+                  }
+                  autoFocus={input.autoFocus}
+                  invalid={fieldState.invalid}
+                  onBlur={field.onBlur}
+                  onChange={(file) => field.onChange(file)}
+                />
+              ) : (
+                <Input
+                  {...field}
+                  id={String(input.name)}
+                  type={input.type}
+                  placeholder={input.placeholder}
+                  aria-label={input.ariaLabel ?? input.label}
+                  aria-invalid={fieldState.invalid}
+                  value={
+                    typeof field.value === "string" ||
+                    typeof field.value === "number"
+                      ? field.value
+                      : ""
+                  }
+                  autoFocus={input.autoFocus}
+                />
+              )}
               <FieldError>{fieldState.error?.message}</FieldError>
             </Field>
           )}
