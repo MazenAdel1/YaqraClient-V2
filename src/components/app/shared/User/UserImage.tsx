@@ -15,11 +15,11 @@ export default function UserImage({ id, innavigable = false }: UserImageProps) {
 
   const router = useRouter();
 
-  const isCurrentUser = user?.id === id;
+  const isTheCurrentUser = user?.id === id;
   const profilePicture = user?.picture;
 
   useEffect(() => {
-    if (!user && !isCurrentUser) {
+    if (!user && !isTheCurrentUser) {
       (async () => {
         const { data } = await axios.get(`/user/user?userId=${id}`);
         setUserData({
@@ -28,12 +28,12 @@ export default function UserImage({ id, innavigable = false }: UserImageProps) {
         });
       })();
     }
-  }, [id, isCurrentUser, user]);
+  }, [id, isTheCurrentUser, user]);
 
   const avatar =
-    isCurrentUser && profilePicture ? (
+    isTheCurrentUser && profilePicture ? (
       <Image
-        src={`${process.env.NEXT_PUBLIC_SERVER_URL}/${profilePicture}`}
+        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${profilePicture}`}
         alt="Profile Picture"
         width={40}
         height={40}
@@ -41,7 +41,7 @@ export default function UserImage({ id, innavigable = false }: UserImageProps) {
       />
     ) : userData?.picture ? (
       <Image
-        src={`${process.env.NEXT_PUBLIC_SERVER_URL}/${userData.picture}`}
+        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${userData.picture}`}
         alt="Profile Picture"
         width={40}
         height={40}
