@@ -10,6 +10,7 @@ export type UserState = Partial<{
   bio: string;
   followersCount: number;
   followingsCount: number;
+  isFollowed: boolean;
 }>;
 
 export type UserActions = {
