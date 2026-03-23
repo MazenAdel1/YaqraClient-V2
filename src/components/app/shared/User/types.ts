@@ -1,4 +1,4 @@
 export type UserImageProps = {
-  id?: string;
+  id: string;
   innavigable?: boolean;
 };
