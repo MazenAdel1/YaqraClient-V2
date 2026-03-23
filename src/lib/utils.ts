@@ -10,11 +10,27 @@ import { jwtDecode } from "jwt-decode";
 
 type DecodedToken = {
   uid: string;
+  roles?: string[];
 };
 
 export function getUserId(token: string) {
   const decoded = jwtDecode<DecodedToken>(token);
   return decoded.uid;
+}
+
+export function getUserRoles(token: string): string[] | undefined {
+  const decoded = jwtDecode<DecodedToken>(token);
+  const rawRoles = decoded.roles;
+
+  if (Array.isArray(rawRoles)) {
+    return rawRoles.filter((role) => typeof role === "string");
+  }
+
+  if (typeof rawRoles === "string") {
+    return [rawRoles];
+  }
+
+  return undefined;
 }
 
 // auth token store utils
@@ -27,20 +43,27 @@ export async function getAuthToken(): Promise<string | null> {
     return cachedToken;
   }
 
-  const response = await fetch(TOKEN_API_ROUTE, {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
-  });
+  if (typeof window !== "undefined") {
+    const response = await fetch(TOKEN_API_ROUTE, {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    });
 
-  if (!response.ok) {
-    cachedToken = null;
-    return null;
+    if (!response.ok) {
+      cachedToken = null;
+      return null;
+    }
+
+    const data = (await response.json()) as { token: string | null };
+    cachedToken = data.token;
+
+    return cachedToken;
   }
 
-  const data = (await response.json()) as { token: string | null };
-  cachedToken = data.token;
-
+  const { cookies } = await import("next/headers");
+  const cookieStore = await cookies();
+  cachedToken = cookieStore.get("token")?.value ?? null;
   return cachedToken;
 }
 
