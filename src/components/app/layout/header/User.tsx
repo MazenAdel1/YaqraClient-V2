@@ -20,7 +20,7 @@ export default function User() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <UserImage innavigable />
+        <UserImage id={user?.id as string} innavigable />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="max-sm:w-[calc(100vw-2rem)]! max-sm:min-w-0! sm:w-50"
