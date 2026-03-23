@@ -1,5 +1,6 @@
 import ax, { AxiosError } from "axios";
 import { clearAuthToken, getAuthToken, setAuthToken } from "@/lib/utils";
+import { jwtDecode } from "jwt-decode";
 
 const baseURL = "https://localhost:7282";
 
@@ -8,6 +9,13 @@ export const axios = ax.create({
   timeout: 5000,
   withCredentials: true,
 });
+
+export const AUTH_INVALID_EVENT = "auth:invalid";
+
+function emitAuthInvalidEvent() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(AUTH_INVALID_EVENT));
+}
 
 type RefreshSession = {
   token: string;
@@ -18,26 +26,57 @@ type RefreshSession = {
 
 let refreshTokenRequest: Promise<RefreshSession> | null = null;
 
+type JwtPayload = {
+  exp?: number;
+};
+
+const isValidAccessToken = (token: unknown) => {
+  if (typeof token !== "string" || token.length === 0) {
+    return false;
+  }
+
+  try {
+    const payload = jwtDecode<JwtPayload>(token);
+
+    if (typeof payload.exp === "number") {
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      if (payload.exp <= nowInSeconds) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export async function refreshAuthSession() {
   if (!refreshTokenRequest) {
     refreshTokenRequest = (async () => {
-      const { data } = await axios.get(`/auth/refreshtoken`);
+      try {
+        const { data } = await axios.get(`/auth/refreshtoken`);
 
-      const nextToken = data?.token;
+        const nextToken = data?.token;
 
-      if (!nextToken || typeof nextToken !== "string") {
-        throw new Error(
-          "Refresh token response does not include an access token",
-        );
+        if (!isValidAccessToken(nextToken)) {
+          throw new Error(
+            "Refresh token response does not include a valid access token",
+          );
+        }
+
+        await setAuthToken(nextToken);
+        return {
+          username: data?.username,
+          email: data?.email,
+          roles: data?.roles,
+          token: nextToken,
+        };
+      } catch (error) {
+        await clearAuthToken();
+        emitAuthInvalidEvent();
+        throw error;
       }
-
-      await setAuthToken(nextToken);
-      return {
-        username: data?.username,
-        email: data?.email,
-        roles: data?.roles,
-        token: nextToken,
-      };
     })().finally(() => {
       refreshTokenRequest = null;
     });
@@ -50,10 +89,15 @@ axios.interceptors.request.use((config) => {
   return (async () => {
     const token = await getAuthToken();
 
-    if (token) {
+    if (isValidAccessToken(token)) {
       config.headers.set("Authorization", `Bearer ${token}`);
     } else {
       config.headers.delete("Authorization");
+
+      if (token) {
+        await clearAuthToken();
+        emitAuthInvalidEvent();
+      }
     }
 
     return config;
@@ -88,6 +132,7 @@ axios.interceptors.response.use(
       return axios(originalRequest);
     } catch (refreshError) {
       await clearAuthToken();
+      emitAuthInvalidEvent();
       return Promise.reject(refreshError);
     }
   },
