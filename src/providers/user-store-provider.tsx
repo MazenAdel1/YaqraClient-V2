@@ -10,8 +10,14 @@ import {
   useState,
 } from "react";
 import { type UserState } from "@/stores/user-store";
-import { getAuthToken, getUserId, getUserRoles } from "@/lib/utils";
-import { axios, refreshAuthSession } from "@/lib/axios";
+import {
+  clearAuthToken,
+  getAuthToken,
+  getUserId,
+  getUserRoles,
+} from "@/lib/utils";
+import { AUTH_INVALID_EVENT, axios, refreshAuthSession } from "@/lib/axios";
+import { usePathname, useRouter } from "next/navigation";
 
 type UserStoreContextValue = {
   user: UserState | null;
@@ -30,6 +36,29 @@ export type UserStoreProviderProps = {
 export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
   const [user, setUser] = useState<UserState | null>(null);
   const [isHydratingUser, setIsHydratingUser] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleInvalidSession = useCallback(async () => {
+    await clearAuthToken();
+    setUser(null);
+
+    if (pathname !== "/login") {
+      router.replace("/login");
+    }
+  }, [pathname, router]);
+
+  useEffect(() => {
+    const onAuthInvalid = () => {
+      void handleInvalidSession();
+    };
+
+    window.addEventListener(AUTH_INVALID_EVENT, onAuthInvalid);
+
+    return () => {
+      window.removeEventListener(AUTH_INVALID_EVENT, onAuthInvalid);
+    };
+  }, [handleInvalidSession]);
 
   useEffect(() => {
     let isMounted = true;
@@ -43,7 +72,10 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
         try {
           session = await refreshAuthSession();
         } catch {
-          session = null;
+          if (isMounted) {
+            await handleInvalidSession();
+          }
+          return;
         }
 
         const token = session?.token ?? storedToken;
@@ -91,7 +123,7 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
         }));
       } catch {
         if (!isMounted) return;
-        setUser(null);
+        await handleInvalidSession();
       } finally {
         if (isMounted) {
           setIsHydratingUser(false);
@@ -102,7 +134,7 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [handleInvalidSession]);
 
   const updateUser = useCallback((nextUser: UserState | null) => {
     setUser((prevUser) => (nextUser ? { ...prevUser, ...nextUser } : null));
