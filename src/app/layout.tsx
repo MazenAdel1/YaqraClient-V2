@@ -9,8 +9,8 @@ import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/providers/query-provider";
 
 const fontSans = Noto_Sans_Arabic({
+  variable: "--font-sans",
   subsets: ["arabic", "latin"],
-  variable: "--font-arabic",
 });
 
 const geistSans = Geist({
