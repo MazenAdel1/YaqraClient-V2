@@ -30,7 +30,7 @@ export const PROFILE_EDIT_INPUTS: FormInput<typeof PROFILE_EDIT_SCHEMA>[] = [
 
 export const PASSWORD_EDIT_SCHEMA = z
   .object({
-    currentpassword: z.string().min(1, "كلمة المرور الحالية مطلوبة"),
+    currentpassword: z.string().min(6, "كلمة المرور الحالية مطلوبة"),
     newpassword: z
       .string()
       .min(6, "كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل"),

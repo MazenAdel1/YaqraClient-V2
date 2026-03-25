@@ -15,3 +15,8 @@ export type FollowApiResult = {
   pageNumber: number;
   totalPages: number;
 };
+
+export type UserInfoProps = {
+  userData: UserState;
+  isTheCurrentUser: boolean;
+};

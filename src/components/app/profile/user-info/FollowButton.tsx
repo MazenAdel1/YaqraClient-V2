@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 export default function FollowButton({ user }: { user: UserState }) {
   const queryClient = useQueryClient();
 
-  const { mutateAsync } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
       await axios.post("/user/follow", {
         UserId: user.id,
@@ -28,6 +28,7 @@ export default function FollowButton({ user }: { user: UserState }) {
       className="w-25"
       onClick={handleFollow}
       variant={user.isFollowed ? "outline" : "default"}
+      disabled={isPending}
     >
       {user.isFollowed ? "إلغاء المتابعة" : "متابعة"}
     </Button>
