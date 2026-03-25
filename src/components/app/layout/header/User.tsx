@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserStore } from "@/providers/user-store-provider";
-import { UserImage } from "../../shared/User";
+import { UserImage } from "../../shared/user";
 import {
   DropdownMenu,
   DropdownMenuContent,
