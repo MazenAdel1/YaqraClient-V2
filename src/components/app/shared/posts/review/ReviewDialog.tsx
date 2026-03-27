@@ -8,34 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Edit2, PlusCircle } from "lucide-react";
 import { Form, FormProps } from "@/components/shared/form";
 import z from "zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axios } from "@/lib/axios";
 import { useRef } from "react";
 import { useUserStore } from "@/providers/user-store-provider";
 import { ReviewDialogProps } from "./types";
 
-export default function ReviewDialog({ type, reviewId }: ReviewDialogProps) {
+export default function ReviewDialog({ type, review }: ReviewDialogProps) {
   const { user } = useUserStore();
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const { data } = useQuery({
-    queryKey: ["review", reviewId],
-    queryFn: async () => {
-      if (type === "edit") {
-        const { data } = await axios.get("/community/review", {
-          params: {
-            reviewId,
-          },
-        });
-        return data.result;
-      }
-
-      return null;
-    },
-  });
-
   const SCHEMA = z.object({
-    ...(type === "edit" ? { Id: z.number().default(reviewId) } : {}),
+    ...(type === "edit" ? { Id: z.number().default(review.id) } : {}),
     UserId: z.string().default(user?.id as string),
     Title: z.string().optional(),
     Content: z.string(),
@@ -55,10 +39,10 @@ export default function ReviewDialog({ type, reviewId }: ReviewDialogProps) {
         optionValueKey: "id",
         optionLabelKey: "title",
         defaultOption:
-          type === "edit" && data?.book
+          type === "edit" && review?.book
             ? {
-                value: data.book.id,
-                label: data.book.title,
+                value: review.book.id,
+                label: review.book.title,
               }
             : undefined,
         minQueryLength: 2,
@@ -88,10 +72,10 @@ export default function ReviewDialog({ type, reviewId }: ReviewDialogProps) {
   const defaultValues: FormProps<typeof SCHEMA>["defaultValues"] =
     type === "edit"
       ? {
-          Content: data?.content,
-          Title: data?.title,
-          Rate: data?.rate,
-          BookId: data?.book.id,
+          Content: review?.content,
+          Title: review?.title,
+          Rate: review?.rate,
+          BookId: review?.book.id,
         }
       : undefined;
 
@@ -104,9 +88,9 @@ export default function ReviewDialog({ type, reviewId }: ReviewDialogProps) {
       queryClient.invalidateQueries({
         queryKey: ["profile-reviews"],
       });
-      if (type === "edit" && reviewId) {
+      if (type === "edit" && review?.id) {
         queryClient.invalidateQueries({
-          queryKey: ["review", reviewId],
+          queryKey: ["review", review.id],
         });
       }
       closeRef.current?.click();
@@ -136,7 +120,7 @@ export default function ReviewDialog({ type, reviewId }: ReviewDialogProps) {
       <DialogContent>
         <DialogClose className={"hidden"} ref={closeRef} />
         <Form
-          key={type === "edit" ? JSON.stringify(data) : "new"}
+          key={type === "edit" ? JSON.stringify(review) : "new"}
           schema={SCHEMA}
           inputs={INPUTS}
           onSubmit={onSubmit}
