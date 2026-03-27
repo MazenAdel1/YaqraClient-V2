@@ -9,20 +9,25 @@ import {
 import { axios } from "@/lib/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Trash } from "lucide-react";
+import { DeletePostProps } from "./types";
 
-export default function DeleteReview({ reviewId }: { reviewId: number }) {
+export default function DeletePost({
+  postId,
+  queryKey,
+  title,
+}: DeletePostProps) {
   const queryClient = useQueryClient();
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
       await axios.delete("/community/", {
         params: {
-          postId: reviewId,
+          postId,
         },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile-reviews"] });
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     },
   });
   return (
@@ -36,7 +41,9 @@ export default function DeleteReview({ reviewId }: { reviewId: number }) {
       />
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>هل أنت متأكد أنك تريد حذف هذه المراجعة؟</DialogTitle>
+          <DialogTitle>
+            {title ?? "هل أنت متأكد أنك تريد حذف هذا المنشور؟"}
+          </DialogTitle>
         </DialogHeader>
         <Button
           variant={"destructive"}
