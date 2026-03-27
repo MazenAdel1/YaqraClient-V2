@@ -12,6 +12,13 @@ import ImagePicker from "./ImagePicker";
 import { Textarea } from "@/components/ui/textarea";
 import SearchSelect from "./SearchSelect";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DEFAULT_INVALID_MESSAGE = "البينات غير صالحة";
 
@@ -60,105 +67,112 @@ export default function Form<S extends AnyObjectSchema>({
           key={input.name}
           name={input.name}
           control={form.control}
-          render={({ field, fieldState }) =>
-            input.hidden ? (
-              <input
-                type="hidden"
-                name={field.name}
-                value={
-                  typeof field.value === "string" ||
-                  typeof field.value === "number"
-                    ? field.value
-                    : ""
-                }
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                ref={field.ref}
-              />
-            ) : (
-              <Field data-invalid={fieldState.invalid} className={cn("w-full")}>
-                <FieldLabel htmlFor={String(input.name)}>
-                  {input.label}
-                </FieldLabel>
-                {"search" in input ? (
-                  <SearchSelect
-                    id={String(input.name)}
-                    value={
-                      typeof field.value === "string" ||
-                      typeof field.value === "number"
-                        ? field.value
-                        : undefined
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} className={cn("w-full")}>
+              <FieldLabel htmlFor={String(input.name)}>
+                {input.label}
+              </FieldLabel>
+              {"search" in input ? (
+                <SearchSelect
+                  id={String(input.name)}
+                  value={
+                    typeof field.value === "string" ||
+                    typeof field.value === "number" ||
+                    Array.isArray(field.value)
+                      ? field.value
+                      : undefined
+                  }
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder={input.placeholder || input.label}
+                  ariaLabel={input.label}
+                  ariaInvalid={fieldState.invalid}
+                  autoFocus={input.autoFocus}
+                  config={input.search}
+                />
+              ) : input.type === "file" ? (
+                <ImagePicker
+                  id={String(input.name)}
+                  name={field.name}
+                  accept={"accept" in input ? input.accept : undefined}
+                  ariaLabel={input.label}
+                  value={
+                    field.value instanceof File ||
+                    typeof field.value === "string"
+                      ? field.value
+                      : undefined
+                  }
+                  autoFocus={input.autoFocus}
+                  invalid={fieldState.invalid}
+                  onBlur={field.onBlur}
+                  onChange={(file) => field.onChange(file)}
+                />
+              ) : input.type === "textarea" ? (
+                <Textarea
+                  {...field}
+                  id={String(input.name)}
+                  placeholder={input.placeholder || input.label}
+                  aria-label={input.label}
+                  aria-invalid={fieldState.invalid}
+                  autoFocus={input.autoFocus}
+                  value={typeof field.value === "string" ? field.value : ""}
+                  className={"field-sizing-content resize-none"}
+                />
+              ) : input.type === "select" && "options" in input ? (
+                <Select
+                  items={input.options}
+                  value={(field.value ?? input.options[0]?.value) as string}
+                  onValueChange={(value) => {
+                    const option = input.options.find(
+                      (opt) => opt.value === value,
+                    );
+                    field.onChange(option?.value);
+                  }}
+                >
+                  <SelectTrigger id={String(input.name)}>
+                    <SelectValue placeholder={input.placeholder} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {input.options.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  {...field}
+                  id={String(input.name)}
+                  type={input.type}
+                  placeholder={input.placeholder || input.label}
+                  aria-label={input.label}
+                  aria-invalid={fieldState.invalid}
+                  value={
+                    typeof field.value === "string" ||
+                    typeof field.value === "number"
+                      ? field.value
+                      : ""
+                  }
+                  onChange={(event) => {
+                    if (input.type === "number") {
+                      const rawValue = event.target.value;
+                      field.onChange(
+                        rawValue === "" ? undefined : Number(rawValue),
+                      );
+                      return;
                     }
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    placeholder={input.placeholder || input.label}
-                    ariaLabel={input.label}
-                    ariaInvalid={fieldState.invalid}
-                    autoFocus={input.autoFocus}
-                    config={input.search}
-                  />
-                ) : input.type === "file" ? (
-                  <ImagePicker
-                    id={String(input.name)}
-                    name={field.name}
-                    accept={"accept" in input ? input.accept : undefined}
-                    ariaLabel={input.label}
-                    value={
-                      field.value instanceof File ||
-                      typeof field.value === "string"
-                        ? field.value
-                        : undefined
-                    }
-                    autoFocus={input.autoFocus}
-                    invalid={fieldState.invalid}
-                    onBlur={field.onBlur}
-                    onChange={(file) => field.onChange(file)}
-                  />
-                ) : input.type === "textarea" ? (
-                  <Textarea
-                    {...field}
-                    id={String(input.name)}
-                    placeholder={input.placeholder || input.label}
-                    aria-label={input.label}
-                    aria-invalid={fieldState.invalid}
-                    autoFocus={input.autoFocus}
-                    value={typeof field.value === "string" ? field.value : ""}
-                    className={"field-sizing-content resize-none"}
-                  />
-                ) : (
-                  <Input
-                    {...field}
-                    id={String(input.name)}
-                    type={input.type}
-                    placeholder={input.placeholder || input.label}
-                    aria-label={input.label}
-                    aria-invalid={fieldState.invalid}
-                    value={
-                      typeof field.value === "string" ||
-                      typeof field.value === "number"
-                        ? field.value
-                        : ""
-                    }
-                    onChange={(event) => {
-                      if (input.type === "number") {
-                        const rawValue = event.target.value;
-                        field.onChange(
-                          rawValue === "" ? undefined : Number(rawValue),
-                        );
-                        return;
-                      }
 
-                      field.onChange(event);
-                    }}
-                    autoFocus={input.autoFocus}
-                  />
-                )}
-                <FieldError>
-                  {formatValidationMessage(fieldState.error?.message)}
-                </FieldError>
-              </Field>
-            )
-          }
+                    field.onChange(event);
+                  }}
+                  autoFocus={input.autoFocus}
+                />
+              )}
+              <FieldError>
+                {formatValidationMessage(fieldState.error?.message)}
+              </FieldError>
+            </Field>
+          )}
         />
       ))}
 
