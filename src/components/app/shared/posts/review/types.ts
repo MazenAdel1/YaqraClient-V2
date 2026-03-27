@@ -7,14 +7,16 @@ export type ReviewProps = {
   rate: number;
   book: BookProps;
   userId: string;
+  username: string;
+  createdDate: string;
 };
 
 export type ReviewDialogProps =
   | {
       type: "add";
-      reviewId?: never;
+      review?: never;
     }
   | {
       type: "edit";
-      reviewId: number;
+      review: ReviewProps;
     };
