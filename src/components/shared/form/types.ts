@@ -10,8 +10,10 @@ export type SearchSelectConfig = {
   optionValueKey?: string;
   optionLabelKey?: string;
   defaultOption?: { value: string | number; label: string };
+  defaultOptions?: { value: string | number; label: string }[];
   minQueryLength?: number;
   noResultsText?: string;
+  multiple?: boolean;
 };
 
 type BaseFormInput<S extends AnyObjectSchema> = {
@@ -19,7 +21,6 @@ type BaseFormInput<S extends AnyObjectSchema> = {
   label: string;
   placeholder?: string;
   autoFocus?: boolean;
-  hidden?: boolean;
   value?: string | number;
 };
 
@@ -33,9 +34,15 @@ type SearchSelectFormInput<S extends AnyObjectSchema> = BaseFormInput<S> & {
   search: SearchSelectConfig;
 };
 
+type SelectFormInput<S extends AnyObjectSchema> = BaseFormInput<S> & {
+  type: "select";
+  options: { value: string | number; label: string }[];
+};
+
 export type FormInput<S extends AnyObjectSchema> =
   | RegularFormInput<S>
-  | SearchSelectFormInput<S>;
+  | SearchSelectFormInput<S>
+  | SelectFormInput<S>;
 
 export type FormProps<S extends AnyObjectSchema> = {
   schema: S;
@@ -63,8 +70,8 @@ export type Option = { value: string | number; label: string };
 
 export type SearchSelectProps = {
   id: string;
-  value?: string | number;
-  onChange: (value: string | number | undefined) => void;
+  value?: string | number | (string | number)[];
+  onChange: (value: string | number | (string | number)[] | undefined) => void;
   onBlur?: () => void;
   placeholder?: string;
   ariaLabel?: string;
@@ -77,7 +84,9 @@ export type SearchSelectProps = {
     optionValueKey?: string;
     optionLabelKey?: string;
     defaultOption?: Option;
+    defaultOptions?: Option[];
     minQueryLength?: number;
     noResultsText?: string;
+    multiple?: boolean;
   };
 };
