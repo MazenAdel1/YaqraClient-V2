@@ -92,3 +92,25 @@ export async function clearAuthToken() {
 
   cachedToken = null;
 }
+
+export function timeAgo(createdAt: string) {
+  const seconds = Math.floor(
+    (Date.now() - new Date(createdAt + "Z").getTime()) / 1000,
+  );
+
+  const intervals = [
+    { label: ["سنة", "سنوات"], seconds: 31536000 },
+    { label: ["شهر", "أشهر"], seconds: 2592000 },
+    { label: ["أسبوع", "أسابيع"], seconds: 604800 },
+    { label: ["يوم", "أيام"], seconds: 86400 },
+    { label: ["ساعة", "ساعات"], seconds: 3600 },
+    { label: ["دقيقة", "دقائق"], seconds: 60 },
+  ];
+
+  for (const { label, seconds: s } of intervals) {
+    const count = Math.floor(seconds / s);
+    if (count >= 1) return `${count} ${count === 1 ? label[0] : label[1]}`;
+  }
+
+  return "الآن";
+}
