@@ -1,3 +1,5 @@
+"use client";
+
 import { Form, FormProps } from "@/components/shared/form";
 import { Button } from "@/components/ui/button";
 import {

@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import PasswordEditDialog from "./PasswordEditDialog";
 import ProfileEditDialog from "./ProfileEditDialog";
@@ -17,7 +19,7 @@ export default function UserInfo({
           <ProfileEditDialog
             defaultValues={{
               pic: userData.picture
-                ? `${process.env.NEXT_PUBLIC_SERVER_URL}/${userData.picture}`
+                ? `${process.env.NEXT_PUBLIC_SERVER_URL}${userData.picture}`
                 : undefined,
               userName: userData.username,
               userBio: userData.bio,
@@ -28,10 +30,11 @@ export default function UserInfo({
       )}
       {userData?.picture ? (
         <Image
-          src={`${process.env.NEXT_PUBLIC_SERVER_URL}/${userData.picture}`}
+          src={`${process.env.NEXT_PUBLIC_SERVER_URL}${userData.picture}`}
           alt="Profile Picture"
           width={200}
           height={200}
+          loading="eager"
           className="size-50 rounded-full border-2 border-white/75 object-cover object-top"
         />
       ) : (

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { axios } from "@/lib/axios";
 import { UserState } from "@/stores/user-store";
