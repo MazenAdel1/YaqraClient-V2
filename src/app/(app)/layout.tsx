@@ -8,7 +8,7 @@ export default async function layout({
   return (
     <div>
       <Header />
-      <main className="container pt-28">{children}</main>
+      <main className="container pt-28 pb-5">{children}</main>
     </div>
   );
 }
