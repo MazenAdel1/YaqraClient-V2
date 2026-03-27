@@ -1,15 +1,15 @@
 import { DataProps } from "./types";
-import { Reviews } from "./tabs";
+import { Reviews, Discussions, Playlists } from "./tabs";
 
-export default function Data({ activeTab, userId }: DataProps) {
+export default function ProfileBody({ activeTab, userId }: DataProps) {
   const renderContent = () => {
     switch (activeTab) {
       case "reviews":
         return <Reviews userId={userId} />;
       case "discussions":
-        return <div>Discussions Content</div>;
+        return <Discussions userId={userId} />;
       case "playlists":
-        return <div>Playlists Content</div>;
+        return <Playlists userId={userId} />;
       case "goals":
         return <div>Goals Content</div>;
       default:

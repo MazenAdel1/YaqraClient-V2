@@ -1,12 +1,14 @@
 "use client";
 
-import { ReviewProps } from "@/components/app/shared/posts/review";
-
 import { axios } from "@/lib/axios";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useUserStore } from "@/providers/user-store-provider";
-import { Review, ReviewDialog } from "@/components/app/shared/posts/review";
+import {
+  ReviewProps,
+  Review,
+  ReviewDialog,
+} from "@/components/app/shared/posts/review";
 
 export default function Reviews({ userId }: { userId: string }) {
   const { user: theCurrentUser } = useUserStore();

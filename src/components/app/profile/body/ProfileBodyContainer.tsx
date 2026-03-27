@@ -1,8 +1,8 @@
 import { Tabs } from "./tabs";
-import Data from "./Data";
 import { TabValue } from "./types";
+import ProfileBody from "./ProfileBody";
 
-export default function DataContainer({
+export default function ProfileBodyContainer({
   userId,
   activeTab,
 }: {
@@ -12,7 +12,7 @@ export default function DataContainer({
   return (
     <section className="flex w-full max-w-150 flex-col gap-6 self-center">
       <Tabs userId={userId} activeTab={activeTab} />
-      <Data activeTab={activeTab} userId={userId} />
+      <ProfileBody activeTab={activeTab} userId={userId} />
     </section>
   );
 }

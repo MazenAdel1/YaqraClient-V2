@@ -1,7 +1,9 @@
-import DataContainer from "@/components/app/profile/data/DataContainer";
-import { TABS } from "@/components/app/profile/data/consts";
-import { TabValue } from "@/components/app/profile/data/types";
-import ProfileHeaderClient from "@/components/app/profile/user-info/ProfileHeaderClient";
+import {
+  ProfileBodyContainer,
+  TabValue,
+  TABS,
+} from "@/components/app/profile/body";
+import { ProfileHeaderClient } from "@/components/app/profile/user-info";
 
 const DEFAULT_TAB: TabValue = "reviews";
 
@@ -29,7 +31,7 @@ export default async function Page({
   return (
     <div className="flex flex-col gap-8">
       <ProfileHeaderClient userId={id} />
-      <DataContainer userId={id} activeTab={activeTab} />
+      <ProfileBodyContainer userId={id} activeTab={activeTab} />
     </div>
   );
 }
