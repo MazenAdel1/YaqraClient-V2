@@ -1,5 +1,5 @@
 import { DataProps } from "./types";
-import { Reviews, Discussions, Playlists } from "./tabs";
+import { Reviews, Discussions, Playlists, Goals } from "./tabs";
 
 export default function ProfileBody({ activeTab, userId }: DataProps) {
   const renderContent = () => {
@@ -11,7 +11,7 @@ export default function ProfileBody({ activeTab, userId }: DataProps) {
       case "playlists":
         return <Playlists userId={userId} />;
       case "goals":
-        return <div>Goals Content</div>;
+        return <Goals userId={userId} />;
       default:
         return null;
     }
