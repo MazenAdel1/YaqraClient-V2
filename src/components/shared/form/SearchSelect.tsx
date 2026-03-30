@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Option, SearchSelectProps } from "./types";
+import { useDebounce } from "@/hooks";
 
 export default function SearchSelect({
   id,
@@ -33,19 +34,22 @@ export default function SearchSelect({
 
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Option | Option[] | null>(
-    isMultiple
-      ? config.defaultOptions ?? []
-      : config.defaultOption ?? null
+    isMultiple ? (config.defaultOptions ?? []) : (config.defaultOption ?? null),
   );
 
   const minLength = config.minQueryLength ?? 2;
   const canSearch = query.trim().length >= minLength;
+  const debouncedQuery = useDebounce(query, 300) as string;
 
   const { data: options = [], isFetching } = useQuery({
-    queryKey: ["search-select", config.endpoint, query.trim().toLowerCase()],
+    queryKey: [
+      "search-select",
+      config.endpoint,
+      debouncedQuery.trim().toLowerCase(),
+    ],
     queryFn: async () => {
       const { data } = await axios.get(config.endpoint, {
-        params: { [config.queryParam]: query },
+        params: { [config.queryParam]: debouncedQuery },
       });
 
       const items = data?.result?.data ?? data?.result ?? [];
