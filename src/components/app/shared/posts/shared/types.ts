@@ -3,3 +3,12 @@ export type DeletePostProps = {
   title?: string;
   queryKey: string;
 };
+
+export type PostBaseProps = {
+  id: number;
+  userId: string;
+  username: string;
+  createdDate: string;
+  likeCount: number;
+  isLiked: boolean;
+};

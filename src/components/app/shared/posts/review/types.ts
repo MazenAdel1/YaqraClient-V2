@@ -1,14 +1,11 @@
 import { BookProps } from "@/components/app/feed/types";
+import { PostBaseProps } from "../shared/types";
 
-export type ReviewProps = {
-  id: number;
+export type ReviewProps = PostBaseProps & {
   title: string;
   content: string;
   rate: number;
   book: BookProps;
-  userId: string;
-  username: string;
-  createdDate: string;
 };
 
 export type ReviewDialogProps =

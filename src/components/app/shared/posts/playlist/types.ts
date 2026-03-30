@@ -1,13 +1,10 @@
 import { BookProps } from "@/components/app/feed/types";
+import { PostBaseProps } from "../shared/types";
 
-export type PlaylistProps = {
-  id: number;
+export type PlaylistProps = PostBaseProps & {
   title: string;
   content: string;
   books: BookProps[];
-  userId: string;
-  username: string;
-  createdDate: string;
 };
 
 export type PlaylistDialogProps =
