@@ -111,11 +111,7 @@ export default function DiscussionDialog({
       queryClient.invalidateQueries({
         queryKey: ["profile-discussions"],
       });
-      if (type === "edit" && discussion?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ["discussion", discussion.id],
-        });
-      }
+
       closeRef.current?.click();
     },
   });

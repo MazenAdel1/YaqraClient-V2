@@ -96,11 +96,7 @@ export default function PlaylistDialog({
       queryClient.invalidateQueries({
         queryKey: ["profile-playlists"],
       });
-      if (type === "edit" && playlist?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ["playlist", playlist.id],
-        });
-      }
+
       closeRef.current?.click();
     },
   });

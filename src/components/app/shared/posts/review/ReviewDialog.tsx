@@ -88,11 +88,7 @@ export default function ReviewDialog({ type, review }: ReviewDialogProps) {
       queryClient.invalidateQueries({
         queryKey: ["profile-reviews"],
       });
-      if (type === "edit" && review?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ["review", review.id],
-        });
-      }
+
       closeRef.current?.click();
     },
   });
