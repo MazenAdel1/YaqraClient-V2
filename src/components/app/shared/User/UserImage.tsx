@@ -7,28 +7,35 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { axios } from "@/lib/axios";
 import { UserState } from "@/stores/user-store";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function UserImage({ id, innavigable = false }: UserImageProps) {
-  const [userData, setUserData] = useState<UserState | null>(null);
-  const { user } = useUserStore();
+export default function UserImage({
+  id,
+  user,
+  innavigable = false,
+  showName = true,
+}: UserImageProps) {
+  const [fetchedUserData, setFetchedUserData] = useState<UserState | null>(
+    null,
+  );
+  const { user: theCurrentUser } = useUserStore();
 
-  const router = useRouter();
-
-  const isTheCurrentUser = user?.id === id;
-  const profilePicture = user?.picture;
+  const isTheCurrentUser = theCurrentUser?.id === id;
+  const profilePicture = theCurrentUser?.picture;
 
   useEffect(() => {
-    if (!user && !isTheCurrentUser) {
+    if (!theCurrentUser && !isTheCurrentUser && !user) {
       (async () => {
         const { data } = await axios.get(`/user/user?userId=${id}`);
-        setUserData({
+        setFetchedUserData({
           picture: data.result.profilePicture,
           username: data.result.username,
         });
       })();
     }
-  }, [id, isTheCurrentUser, user]);
+  }, [id, isTheCurrentUser, theCurrentUser, user]);
+
+  const userData = user || fetchedUserData;
 
   const avatar =
     isTheCurrentUser && profilePicture ? (
@@ -60,13 +67,18 @@ export default function UserImage({ id, innavigable = false }: UserImageProps) {
   }
 
   return (
-    <button
-      className="bg-light-gray flex size-10 items-center justify-center rounded-full"
-      onClick={() => {
-        router.push(`/profile/${id}`);
-      }}
-    >
-      {avatar}
-    </button>
+    <div className="flex items-center gap-2">
+      <Link
+        href={`/profile/${id}`}
+        className="bg-light-gray flex size-10 items-center justify-center rounded-full"
+      >
+        {avatar}
+      </Link>
+      {showName && userData?.username && (
+        <Link href={`/profile/${id}`} className="mt-1 text-center text-sm">
+          {userData?.username}
+        </Link>
+      )}
+    </div>
   );
 }
