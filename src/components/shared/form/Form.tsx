@@ -39,6 +39,9 @@ export default function Form<S extends AnyObjectSchema>({
   onSubmit,
   submitLabel = "ارسال",
   ref,
+  inline,
+  hideLabels,
+  className,
 }: FormProps<S>) {
   const form = useForm<z.input<S>, unknown, z.output<S>>({
     resolver: zodResolver(schema),
@@ -60,7 +63,11 @@ export default function Form<S extends AnyObjectSchema>({
           });
         }
       })}
-      className="flex w-full flex-col gap-4"
+      className={cn(
+        "flex w-full gap-4",
+        inline ? "flex-row items-end" : "flex-col",
+        className,
+      )}
     >
       {inputs.map((input) => (
         <Controller
@@ -69,9 +76,11 @@ export default function Form<S extends AnyObjectSchema>({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid} className={cn("w-full")}>
-              <FieldLabel htmlFor={String(input.name)}>
-                {input.label}
-              </FieldLabel>
+              {!hideLabels && (
+                <FieldLabel htmlFor={String(input.name)}>
+                  {input.label}
+                </FieldLabel>
+              )}
               {"search" in input ? (
                 <SearchSelect
                   id={String(input.name)}
@@ -184,11 +193,23 @@ export default function Form<S extends AnyObjectSchema>({
 
       <Button
         type="submit"
-        className={"w-full"}
+        className={cn("w-full", inline && "w-max min-w-5 self-start")}
         disabled={form.formState.isSubmitting}
       >
-        {submitLabel}{" "}
-        {form.formState.isSubmitting && <Loader2 className="animate-spin" />}
+        {inline ? (
+          form.formState.isSubmitting ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            submitLabel
+          )
+        ) : (
+          <>
+            {submitLabel}{" "}
+            {form.formState.isSubmitting && (
+              <Loader2 className="animate-spin" />
+            )}
+          </>
+        )}
       </Button>
     </form>
   );
