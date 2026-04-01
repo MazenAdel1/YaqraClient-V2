@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { DefaultValues, Path, SubmitHandler } from "react-hook-form";
 import { HTMLInputTypeAttribute, Ref } from "react";
+import { ClassNameValue } from "tailwind-merge";
 
 export type AnyObjectSchema = z.ZodObject<z.ZodRawShape>;
 
@@ -51,6 +52,9 @@ export type FormProps<S extends AnyObjectSchema> = {
   onSubmit: SubmitHandler<z.output<S>>;
   submitLabel?: string;
   ref?: Ref<HTMLFormElement>;
+  inline?: boolean;
+  hideLabels?: boolean;
+  className?: ClassNameValue;
 };
 
 export type ImagePickerProps = {
