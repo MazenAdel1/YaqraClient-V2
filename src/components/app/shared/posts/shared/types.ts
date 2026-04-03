@@ -1,3 +1,7 @@
+import { DiscussionProps } from "../discussion";
+import { PlaylistProps } from "../playlist";
+import { ReviewProps } from "../review";
+
 export type DeletePostProps = {
   postId: number;
   title?: string;
@@ -11,4 +15,11 @@ export type PostBaseProps = {
   createdDate: string;
   likeCount: number;
   isLiked: boolean;
+};
+
+export type PostWrapperProps = {
+  children: React.ReactNode;
+  post: PostBaseProps & (ReviewProps | DiscussionProps | PlaylistProps);
+  editDialog: React.ReactNode;
+  queryKey: string;
 };
