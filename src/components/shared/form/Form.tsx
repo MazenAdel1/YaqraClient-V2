@@ -42,6 +42,7 @@ export default function Form<S extends AnyObjectSchema>({
   inline,
   hideLabels,
   className,
+  resetOnSuccess,
 }: FormProps<S>) {
   const form = useForm<z.input<S>, unknown, z.output<S>>({
     resolver: zodResolver(schema),
@@ -54,6 +55,9 @@ export default function Form<S extends AnyObjectSchema>({
       onSubmit={form.handleSubmit(async (e) => {
         try {
           await onSubmit(e);
+          if (resetOnSuccess) {
+            form.reset();
+          }
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           form.setError("root", {
