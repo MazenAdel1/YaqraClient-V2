@@ -5,7 +5,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Edit2, PlusCircle } from "lucide-react";
+import { Edit, PlusCircle } from "lucide-react";
 import { Form, FormProps } from "@/components/shared/form";
 import z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -111,7 +111,7 @@ export default function PlaylistDialog({
         render={
           type === "edit" ? (
             <Button variant="ghost" size="icon">
-              <Edit2 className="size-4" />
+              <Edit className="size-4" />
             </Button>
           ) : (
             <Button className="w-fit">
