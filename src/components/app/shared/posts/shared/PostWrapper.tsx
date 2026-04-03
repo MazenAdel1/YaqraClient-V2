@@ -4,7 +4,7 @@ import {
   CardContent,
   CardHeader,
 } from "@/components/ui/card";
-import PostActionWrapper from "./post-actions/PostActionWrapper";
+import PostActionsWrapper from "./post-actions/PostActionsWrapper";
 import { UserImage } from "../../user";
 import { timeAgo } from "@/lib/utils";
 import DeletePost from "./DeletePost";
@@ -21,7 +21,7 @@ export default function PostWrapper({
 
   return (
     <Card>
-      <PostActionWrapper
+      <PostActionsWrapper
         postId={post.id}
         likeCount={post.likeCount}
         isLiked={post.isLiked}
@@ -48,7 +48,7 @@ export default function PostWrapper({
         <CardContent className="-mt-2 flex flex-col gap-4">
           {children}
         </CardContent>
-      </PostActionWrapper>
+      </PostActionsWrapper>
     </Card>
   );
 }
