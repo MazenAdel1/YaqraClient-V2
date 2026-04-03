@@ -55,6 +55,7 @@ export type FormProps<S extends AnyObjectSchema> = {
   inline?: boolean;
   hideLabels?: boolean;
   className?: ClassNameValue;
+  resetOnSuccess?: boolean;
 };
 
 export type ImagePickerProps = {
