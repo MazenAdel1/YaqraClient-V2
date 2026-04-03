@@ -13,7 +13,7 @@ export default function UserImage({
   id,
   user,
   innavigable = false,
-  showName = true,
+  additionalInfo,
 }: UserImageProps) {
   const [fetchedUserData, setFetchedUserData] = useState<UserState | null>(
     null,
@@ -24,39 +24,48 @@ export default function UserImage({
   const profilePicture = theCurrentUser?.picture;
 
   useEffect(() => {
-    if (!theCurrentUser && !isTheCurrentUser && !user) {
-      (async () => {
-        const { data } = await axios.get(`/user/user?userId=${id}`);
-        setFetchedUserData({
-          picture: data.result.profilePicture,
-          username: data.result.username,
-        });
-      })();
-    }
-  }, [id, isTheCurrentUser, theCurrentUser, user]);
+    if (isTheCurrentUser || user) return;
 
-  const userData = user || fetchedUserData;
+    let isMounted = true;
 
-  const avatar =
-    isTheCurrentUser && profilePicture ? (
-      <Image
-        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${profilePicture}`}
-        alt="Profile Picture"
-        width={40}
-        height={40}
-        className="rounded-full"
-      />
-    ) : userData?.picture ? (
-      <Image
-        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${userData.picture}`}
-        alt="Profile Picture"
-        width={40}
-        height={40}
-        className="rounded-full"
-      />
-    ) : (
-      <UserIcon className="size-5" />
-    );
+    (async () => {
+      const { data } = await axios.get(`/user/user?userId=${id}`);
+      if (!isMounted) return;
+
+      setFetchedUserData({
+        picture: data.result.profilePicture,
+        username: data.result.username,
+      });
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, isTheCurrentUser, user]);
+
+  const currentUserData = isTheCurrentUser
+    ? {
+        picture: profilePicture,
+        username: theCurrentUser?.username || "",
+      }
+    : null;
+
+  // to match the user type and kick away the mismatch between the server response and client types
+  const correctedUser = user && { ...user, picture: user.profilePicture };
+
+  const userData = correctedUser || currentUserData || fetchedUserData;
+
+  const avatar = userData?.picture ? (
+    <Image
+      src={`${process.env.NEXT_PUBLIC_SERVER_URL}${userData.picture}`}
+      alt="Profile Picture"
+      width={40}
+      height={40}
+      className="rounded-full"
+    />
+  ) : (
+    <UserIcon className="size-5" />
+  );
 
   if (innavigable) {
     return (
@@ -74,11 +83,16 @@ export default function UserImage({
       >
         {avatar}
       </Link>
-      {showName && userData?.username && (
-        <Link href={`/profile/${id}`} className="mt-1 text-center text-sm">
-          {userData?.username}
-        </Link>
-      )}
+      <div className="flex flex-col gap-0.5">
+        {userData?.username && (
+          <Link href={`/profile/${id}`} className="mt-1 text-center text-sm">
+            {userData?.username}
+          </Link>
+        )}
+        {additionalInfo && (
+          <span className="text-[10px] text-gray-300">{additionalInfo}</span>
+        )}
+      </div>
     </div>
   );
 }
