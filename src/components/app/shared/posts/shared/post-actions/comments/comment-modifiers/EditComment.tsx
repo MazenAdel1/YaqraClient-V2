@@ -45,7 +45,7 @@ export default function EditComment({ comment }: { comment: CommentProps }) {
     await mutateAsync(data);
   };
   return (
-    <Dialog modal={false} open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
           <Button variant={"ghost"} size={"icon"}>

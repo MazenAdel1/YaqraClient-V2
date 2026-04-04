@@ -25,7 +25,7 @@ export default function DeleteComment({ comment }: { comment: CommentProps }) {
     await mutateAsync();
   };
   return (
-    <Dialog modal={false}>
+    <Dialog>
       <DialogTrigger
         render={
           <Button variant={"ghost"} size={"icon"}>
