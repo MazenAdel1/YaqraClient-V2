@@ -4,10 +4,9 @@ import { UserIcon } from "lucide-react";
 import { UserImageProps } from "./types";
 import { useUserStore } from "@/providers/user-store-provider";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { axios } from "@/lib/axios";
-import { UserState } from "@/stores/user-store";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 
 export default function UserImage({
   id,
@@ -15,45 +14,34 @@ export default function UserImage({
   innavigable = false,
   additionalInfo,
 }: UserImageProps) {
-  const [fetchedUserData, setFetchedUserData] = useState<UserState | null>(
-    null,
-  );
   const { user: theCurrentUser } = useUserStore();
-
   const isTheCurrentUser = theCurrentUser?.id === id;
-  const profilePicture = theCurrentUser?.picture;
 
-  useEffect(() => {
-    if (isTheCurrentUser || user) return;
+  const { data: userData } = useQuery({
+    queryKey: ["user", id],
+    queryFn: async () => {
+      if (isTheCurrentUser) {
+        return {
+          picture: theCurrentUser?.picture,
+          username: theCurrentUser?.username || "",
+        };
+      }
 
-    let isMounted = true;
+      if (user) {
+        return {
+          picture: user.profilePicture,
+          username: user.username,
+        };
+      }
 
-    (async () => {
       const { data } = await axios.get(`/user/user?userId=${id}`);
-      if (!isMounted) return;
-
-      setFetchedUserData({
+      return {
         picture: data.result.profilePicture,
         username: data.result.username,
-      });
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [id, isTheCurrentUser, user]);
-
-  const currentUserData = isTheCurrentUser
-    ? {
-        picture: profilePicture,
-        username: theCurrentUser?.username || "",
-      }
-    : null;
-
-  // to match the user type and kick away the mismatch between the server response and client types
-  const correctedUser = user && { ...user, picture: user.profilePicture };
-
-  const userData = correctedUser || currentUserData || fetchedUserData;
+      };
+    },
+    enabled: !isTheCurrentUser && !user,
+  });
 
   const avatar = userData?.picture ? (
     <Image
