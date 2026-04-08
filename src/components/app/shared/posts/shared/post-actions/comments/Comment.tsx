@@ -1,7 +1,7 @@
 import { cn, timeAgo } from "@/lib/utils";
 import { CommentProps } from "./types";
 import { UserImage } from "@/components/app/shared/user";
-import FormattedText from "@/components/app/shared/FormattedText";
+import { FormattedText } from "@/components/app/shared";
 import {
   Card,
   CardAction,
