@@ -11,25 +11,17 @@ import GoalDialog from "./GoalDialog";
 import DeleteGoal from "./DeleteGoal";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Calendar, Target } from "lucide-react";
-import FormattedText from "@/components/app/shared/FormattedText";
+import { formatDate, FormattedText } from "@/components/app/shared";
 
 export default function Goal({ goal }: { goal: GoalProps }) {
   const { user: theCurrentUser } = useUserStore();
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("ar-EG", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   return (
     <Card>
       <CardHeader className="gap-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Target className="size-5 text-primary" />
+            <Target className="text-primary size-5" />
             <CardTitle className="font-yoc text-xl">
               {goal.title ?? "هدف قراءة"}
             </CardTitle>
