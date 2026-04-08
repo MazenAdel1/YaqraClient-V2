@@ -22,7 +22,7 @@ export default function Like({ postId, likeCount, isLiked }: LikeProps) {
         (oldData) => {
           if (!oldData) return oldData;
           return oldData.map((item) =>
-            item.id === postId
+            item && item.id === postId
               ? {
                   ...item,
                   likeCount: isLiked ? item.likeCount - 1 : item.likeCount + 1,

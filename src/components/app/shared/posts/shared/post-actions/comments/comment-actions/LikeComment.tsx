@@ -16,6 +16,8 @@ export default function LikeComment({ comment }: { comment: CommentProps }) {
       await queryClient.cancelQueries();
 
       const updateComment = (item: CommentProps): CommentProps => {
+        if (!item) return item;
+
         if (item.id === comment.id) {
           return {
             ...item,
