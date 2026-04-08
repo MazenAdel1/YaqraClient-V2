@@ -15,6 +15,7 @@ export type PostBaseProps = {
   createdDate: string;
   likeCount: number;
   isLiked: boolean;
+  type?: "Review" | "DiscussionArticleNews" | "Playlist";
 };
 
 export type PostWrapperProps = {
