@@ -5,15 +5,9 @@ export type FollowDialogProps = {
   user: UserState;
 };
 
-type FollowItem = {
+export type FollowItem = {
   userId: string;
   username: string;
-};
-
-export type FollowApiResult = {
-  data: FollowItem[];
-  pageNumber: number;
-  totalPages: number;
 };
 
 export type UserInfoProps = {
