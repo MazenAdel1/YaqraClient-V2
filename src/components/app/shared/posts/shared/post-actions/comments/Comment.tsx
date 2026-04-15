@@ -24,7 +24,12 @@ export default function Comment({
 
   return (
     <>
-      <div className={cn("flex flex-col gap-0.5", isReply && "ms-6")}>
+      <div
+        className={cn(
+          "flex flex-col gap-0.5 wrap-break-word",
+          isReply && "ms-6",
+        )}
+      >
         <Card key={comment.id} className="gap-2 px-2 py-3">
           <CardHeader className="px-1">
             <CardTitle>
