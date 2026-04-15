@@ -16,12 +16,11 @@ import { axios } from "@/lib/axios";
 import { useUserStore } from "@/providers/user-store-provider";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 export default function Page() {
   const { user: theCurrentUser } = useUserStore();
   const [isFollowings, setIsFollowings] = useState(false);
-  const lastElementRef = useRef<HTMLDivElement>(null);
 
   const queryClient = useQueryClient();
 
@@ -31,7 +30,6 @@ export default function Page() {
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
-    isFetching,
   } = useInfiniteQuery<TimelinePostProps[]>({
     queryKey: ["timeline", isFollowings],
     queryFn: async ({ pageParam = 1 }) => {
@@ -46,18 +44,33 @@ export default function Page() {
       return data.result;
     },
     initialPageParam: 1,
-    initialData: {
-      pageParams: [1],
-      pages: [],
-    },
     getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.length < 27) return undefined;
+      if (lastPage.length < 27) return null;
       return allPages.length + 1;
     },
   });
 
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries[0]?.isIntersecting) return;
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        },
+        { rootMargin: "200px 0px", threshold: 0 },
+      );
+
+      observer.observe(node);
+
+      return () => observer.disconnect();
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
+
   const renderPosts = () => {
-    return (posts.pages.flat() ?? []).map((post, index: number) => {
+    return (posts?.pages.flat() ?? []).map((post, index: number) => {
       if (Array.isArray(post))
         return <SuggestedBooks key={index} books={post as BookProps[]} />;
 
@@ -78,52 +91,31 @@ export default function Page() {
     });
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasNextPage && !isFetching) {
-        fetchNextPage();
-      }
-    });
-
-    const lastElement = lastElementRef.current;
-
-    if (lastElement) {
-      observer.observe(lastElement);
-    }
-
-    return () => {
-      if (lastElement) {
-        observer.unobserve(lastElement);
-      }
-    };
-  }, [fetchNextPage, hasNextPage, isFetching]);
-
   return (
     <div className="container flex flex-col gap-12 lg:max-w-2xl">
       <div className="flex w-full gap-2 *:flex-1">
         <Button
           variant={isFollowings ? "outline" : "default"}
-          onClick={() => {
-            setIsFollowings(false);
-          }}
+          onClick={() => setIsFollowings(false)}
         >
           الافتراضي
         </Button>
         <Button
           variant={isFollowings ? "default" : "outline"}
-          onClick={() => {
-            setIsFollowings(true);
-          }}
+          onClick={() => setIsFollowings(true)}
         >
           المتابَعين
         </Button>
       </div>
+
       {isLoading ? (
         <Loader2 className="mx-auto size-8 animate-spin" />
       ) : (
         <section className="flex flex-col gap-10">{renderPosts()}</section>
       )}
-      <div className="hidden" ref={lastElementRef} />
+
+      <div ref={sentinelRef} className="h-px w-full" />
+
       {isFetchingNextPage && (
         <Loader2 className="mx-auto size-8 animate-spin" />
       )}
