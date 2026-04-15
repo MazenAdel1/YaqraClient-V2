@@ -8,12 +8,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FollowApiResult, FollowDialogProps } from "./types";
+import { FollowDialogProps, FollowItem } from "./types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { axios } from "@/lib/axios";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { InfiniteQueryResponse } from "@/components/shared";
 
 export default function FollowDialog({ type, user }: FollowDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,13 +39,15 @@ export default function FollowDialog({ type, user }: FollowDialogProps) {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useInfiniteQuery<FollowApiResult>({
+  } = useInfiniteQuery<InfiniteQueryResponse<FollowItem>>({
     queryKey: ["profile", user.id, type],
     initialPageParam: 1,
     queryFn: async ({ pageParam }) => {
-      const { data } = await axios.get(
-        `/user/${type}?userId=${user.id}&page=${pageParam}`,
-      );
+      const { data } = await axios.get(`/user/${type}?userId=${user.id}`, {
+        params: {
+          page: pageParam,
+        },
+      });
       return data.result;
     },
     getNextPageParam: (lastPage) => {
@@ -110,12 +113,9 @@ export default function FollowDialog({ type, user }: FollowDialogProps) {
                 disabled={isFetchingNextPage}
                 onClick={() => fetchNextPage()}
               >
-                {isFetchingNextPage ? (
-                  <>
-                    جاري التحميل <Loader2 className="animate-spin" />
-                  </>
-                ) : (
-                  "تحميل المزيد"
+                تحميل المزيد{" "}
+                {isFetchingNextPage && (
+                  <Loader2 className="mx-auto size-4 animate-spin" />
                 )}
               </Button>
             )}
