@@ -23,8 +23,8 @@ export default function User() {
         <UserImage id={user?.id as string} innavigable />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="max-sm:w-[calc(100vw-2rem)]! max-sm:min-w-0! sm:w-50"
         align="end"
+        className="max-sm:w-[calc(100vw-2rem)]! max-sm:min-w-0! sm:w-xs"
       >
         <DropdownMenuGroup className="*:w-full">
           <DropdownMenuItem
