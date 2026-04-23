@@ -25,7 +25,7 @@ export const ASIDE_LINKS: {
   books: [
     {
       name: "البحث عن كتاب",
-      href: "/",
+      href: "/book-finder",
       icon: Search,
     },
     {
