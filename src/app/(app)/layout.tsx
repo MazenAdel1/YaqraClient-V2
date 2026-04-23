@@ -1,4 +1,4 @@
-import { Header, Aside } from "@/components/app/layout";
+import { Header } from "@/components/app/layout";
 
 export default async function layout({
   children,
@@ -8,8 +8,7 @@ export default async function layout({
   return (
     <div>
       <Header />
-      <Aside />
-      <main className="container pt-28 pb-5">{children}</main>
+      <main className="pt-28 pb-5">{children}</main>
     </div>
   );
 }
