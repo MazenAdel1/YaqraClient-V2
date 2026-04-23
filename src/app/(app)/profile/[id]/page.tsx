@@ -29,7 +29,7 @@ export default async function Page({
   const activeTab = getActiveTab(tab);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="container flex flex-col gap-8">
       <ProfileHeaderClient userId={id} />
       <ProfileBodyContainer userId={id} activeTab={activeTab} />
     </div>
