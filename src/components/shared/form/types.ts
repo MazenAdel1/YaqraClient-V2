@@ -25,8 +25,13 @@ type BaseFormInput<S extends AnyObjectSchema> = {
   value?: string | number;
 };
 
+type Literals<T> = T extends string ? (string extends T ? never : T) : T;
+
 type RegularFormInput<S extends AnyObjectSchema> = BaseFormInput<S> & {
-  type?: HTMLInputTypeAttribute | "textarea";
+  type?: Exclude<
+    Literals<HTMLInputTypeAttribute> | "textarea",
+    "range" | "select" | "search-select"
+  >;
   accept?: string;
 };
 
@@ -40,10 +45,18 @@ type SelectFormInput<S extends AnyObjectSchema> = BaseFormInput<S> & {
   options: { value: string | number; label: string }[];
 };
 
+type RangeFormInput<S extends AnyObjectSchema> = BaseFormInput<S> & {
+  type: "range";
+  min: number;
+  max: number;
+  step: number;
+};
+
 export type FormInput<S extends AnyObjectSchema> =
   | RegularFormInput<S>
   | SearchSelectFormInput<S>
-  | SelectFormInput<S>;
+  | SelectFormInput<S>
+  | RangeFormInput<S>;
 
 export type FormProps<S extends AnyObjectSchema> = {
   schema: S;
