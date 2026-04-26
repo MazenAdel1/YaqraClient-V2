@@ -40,7 +40,6 @@ export default function UserImage({
         username: data.result.username,
       };
     },
-    enabled: !isTheCurrentUser && !user,
   });
 
   const avatar = userData?.picture ? (
