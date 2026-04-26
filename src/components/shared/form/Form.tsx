@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 
 const DEFAULT_INVALID_MESSAGE = "البينات غير صالحة";
 
@@ -85,7 +86,7 @@ export default function Form<S extends AnyObjectSchema>({
                   {input.label}
                 </FieldLabel>
               )}
-              {"search" in input ? (
+              {input.type === "search-select" ? (
                 <SearchSelect
                   id={String(input.name)}
                   value={
@@ -131,7 +132,7 @@ export default function Form<S extends AnyObjectSchema>({
                   value={typeof field.value === "string" ? field.value : ""}
                   className={"field-sizing-content resize-none"}
                 />
-              ) : input.type === "select" && "options" in input ? (
+              ) : input.type === "select" ? (
                 <Select
                   items={input.options}
                   value={(field.value ?? input.options[0]?.value) as string}
@@ -153,6 +154,18 @@ export default function Form<S extends AnyObjectSchema>({
                     ))}
                   </SelectContent>
                 </Select>
+              ) : input.type === "range" ? (
+                <div>
+                  <Slider
+                    {...field}
+                    min={input.min}
+                    max={input.max}
+                    step={input.step}
+                    value={field.value as number}
+                    onValueChange={(value) => field.onChange(value)}
+                  />
+                  {field.value as number}
+                </div>
               ) : (
                 <Input
                   {...field}
