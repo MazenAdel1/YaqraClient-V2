@@ -16,5 +16,5 @@ export default function ProfileBody({ activeTab, userId }: DataProps) {
         return null;
     }
   };
-  return <section className="flex flex-col gap-1">{renderContent()}</section>;
+  return renderContent();
 }
