@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 
 const DEFAULT_INVALID_MESSAGE = "البينات غير صالحة";
 
@@ -155,16 +154,26 @@ export default function Form<S extends AnyObjectSchema>({
                   </SelectContent>
                 </Select>
               ) : input.type === "range" ? (
-                <div>
-                  <Slider
-                    {...field}
-                    min={input.min}
-                    max={input.max}
-                    step={input.step}
-                    value={field.value as number}
-                    onValueChange={(value) => field.onChange(value)}
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="range"
+                    id={String(input.name)}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                    min={input.min ?? 0}
+                    max={input.max ?? 100}
+                    step={input.step ?? 1}
+                    value={
+                      typeof field.value === "number" ? field.value : (input.min ?? 0)
+                    }
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    aria-label={input.label}
+                    aria-invalid={fieldState.invalid}
+                    className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
                   />
-                  {field.value as number}
+                  <span className="text-muted-foreground text-xs">
+                    {field.value as number}
+                  </span>
                 </div>
               ) : (
                 <Input
