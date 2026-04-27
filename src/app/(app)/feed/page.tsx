@@ -20,7 +20,7 @@ import { axios } from "@/lib/axios";
 import { useUserStore } from "@/providers/user-store-provider";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export default function Page() {
   const { user: theCurrentUser } = useUserStore();
@@ -73,7 +73,7 @@ export default function Page() {
     [hasNextPage, isFetchingNextPage, fetchNextPage],
   );
 
-  const renderPosts = () => {
+  const RenderPosts = useMemo(() => {
     return (posts?.pages.flat() ?? []).map((post, index: number) => {
       if (Array.isArray(post))
         return <SuggestedBooks key={index} books={post as BookProps[]} />;
@@ -82,18 +82,34 @@ export default function Page() {
 
       switch (post.type) {
         case "Playlist":
-          return <Playlist key={post.id} playlist={post as PlaylistProps} />;
+          return (
+            <Playlist
+              key={post.id}
+              playlist={post as PlaylistProps}
+              queryKey={["timeline"]}
+            />
+          );
         case "DiscussionArticleNews":
           return (
-            <Discussion key={post.id} discussion={post as DiscussionProps} />
+            <Discussion
+              key={post.id}
+              discussion={post as DiscussionProps}
+              queryKey={["timeline"]}
+            />
           );
         case "Review":
-          return <Review key={post.id} review={post as ReviewProps} />;
+          return (
+            <Review
+              key={post.id}
+              review={post as ReviewProps}
+              queryKey={["timeline"]}
+            />
+          );
         default:
           return null;
       }
     });
-  };
+  }, [posts?.pages, theCurrentUser?.id]);
 
   return (
     <>
@@ -117,7 +133,7 @@ export default function Page() {
         {isLoading ? (
           <Loader2 className="mx-auto size-8 animate-spin" />
         ) : (
-          <section className="flex flex-col gap-10">{renderPosts()}</section>
+          <section className="flex flex-col gap-10">{RenderPosts}</section>
         )}
 
         <div ref={sentinelRef} className="h-px w-full" />
