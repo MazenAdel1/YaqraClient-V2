@@ -10,7 +10,7 @@ export default function ProfileBodyContainer({
   activeTab: TabValue;
 }) {
   return (
-    <section className="flex w-full max-w-150 flex-col gap-6 self-center">
+    <section className="flex w-full max-w-150 flex-col gap-15 self-center">
       <Tabs userId={userId} activeTab={activeTab} />
       <ProfileBody activeTab={activeTab} userId={userId} />
     </section>
