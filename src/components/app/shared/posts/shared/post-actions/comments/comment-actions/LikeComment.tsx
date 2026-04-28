@@ -1,9 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { CommentProps } from "../types";
 import { Heart } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { axios } from "@/lib/axios";
 import { cn } from "@/lib/utils";
+import { InfiniteQueryResponse } from "@/components/shared";
 
 export default function LikeComment({ comment }: { comment: CommentProps }) {
   const queryClient = useQueryClient();
@@ -13,7 +18,8 @@ export default function LikeComment({ comment }: { comment: CommentProps }) {
       await axios.put(`/community/likeComment?commentId=${comment.id}`);
     },
     onMutate: async () => {
-      await queryClient.cancelQueries();
+      const queryKey = ["comments", comment.postId];
+      await queryClient.cancelQueries({ queryKey });
 
       const updateComment = (item: CommentProps): CommentProps => {
         if (!item) return item;
@@ -34,13 +40,23 @@ export default function LikeComment({ comment }: { comment: CommentProps }) {
         return item;
       };
 
-      queryClient.setQueriesData<CommentProps[]>(
-        { predicate: (query) => Array.isArray(query.state.data) },
-        (oldData) => {
-          if (!oldData) return oldData;
-          return oldData.map(updateComment);
-        },
-      );
+      queryClient.setQueriesData<
+        InfiniteData<InfiniteQueryResponse<CommentProps>>
+      >({ queryKey }, (oldData) => {
+        if (!oldData?.pages) return oldData;
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            data: page.data.map(updateComment),
+          })),
+        };
+      });
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", comment.postId],
+      });
     },
   });
   return (
