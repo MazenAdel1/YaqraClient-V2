@@ -25,6 +25,7 @@ export default function PostWrapper({
         postId={post.id}
         likeCount={post.likeCount}
         isLiked={post.isLiked}
+        queryKey={queryKey}
       >
         <CardHeader className="gap-4">
           <div className="flex items-center gap-2">

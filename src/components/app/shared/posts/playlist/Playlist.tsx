@@ -5,12 +5,20 @@ import { Book } from "lucide-react";
 import FormattedText from "../../FormattedText";
 import PostWrapper from "../shared/PostWrapper";
 
-export default function Playlist({ playlist }: { playlist: PlaylistProps }) {
+export default function Playlist({
+  playlist,
+  queryKey,
+}: {
+  playlist: PlaylistProps;
+  queryKey: (string | number)[];
+}) {
   return (
     <PostWrapper
-      editDialog={<PlaylistDialog type="edit" playlist={playlist} />}
+      editDialog={
+        <PlaylistDialog type="edit" data={playlist} queryKey={queryKey} />
+      }
       post={playlist}
-      queryKey="profile-playlists"
+      queryKey={queryKey}
     >
       <h1 className="text-lg">{playlist.title}</h1>
       <div className="grid grid-cols-2">

@@ -8,14 +8,18 @@ import PostWrapper from "../shared/PostWrapper";
 
 export default function Discussion({
   discussion,
+  queryKey,
 }: {
   discussion: DiscussionProps;
+  queryKey: (string | number)[];
 }) {
   return (
     <PostWrapper
-      editDialog={<DiscussionDialog type="edit" discussion={discussion} />}
+      editDialog={
+        <DiscussionDialog type="edit" data={discussion} queryKey={queryKey} />
+      }
       post={discussion}
-      queryKey="profile-discussions"
+      queryKey={queryKey}
     >
       <Badge variant={"secondary"}>
         {TAGS[discussion.tag as keyof typeof TAGS].label}

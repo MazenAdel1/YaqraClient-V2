@@ -5,7 +5,7 @@ import { ReviewProps } from "../review";
 export type DeletePostProps = {
   postId: number;
   title?: string;
-  queryKey: string;
+  queryKey: (string | number)[];
 };
 
 export type PostBaseProps = {
@@ -22,5 +22,18 @@ export type PostWrapperProps = {
   children: React.ReactNode;
   post: PostBaseProps & (ReviewProps | DiscussionProps | PlaylistProps);
   editDialog: React.ReactNode;
-  queryKey: string;
+  queryKey: (string | number)[];
 };
+
+export type PostDialogProps<T> = {
+  queryKey: (string | number)[];
+} & (
+  | {
+      type: "add";
+      data?: Partial<T>;
+    }
+  | {
+      type: "edit";
+      data: T;
+    }
+);

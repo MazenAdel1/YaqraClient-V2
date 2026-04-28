@@ -20,14 +20,14 @@ export default function DeletePost({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
-      await axios.delete("/community/", {
+      await axios.delete(`/community/`, {
         params: {
           postId,
         },
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey });
     },
   });
   return (

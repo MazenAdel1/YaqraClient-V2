@@ -8,13 +8,19 @@ export default function PostActionsWrapper({
   postId,
   likeCount,
   isLiked,
+  queryKey,
 }: PostActionsProps) {
   return (
     <>
       {children}
-      <CardFooter>
+      <CardFooter className="mt-auto">
         <div className="flex w-full items-center gap-4 *:flex-1">
-          <Like postId={postId} likeCount={likeCount} isLiked={isLiked} />
+          <Like
+            postId={postId}
+            likeCount={likeCount}
+            isLiked={isLiked}
+            queryKey={queryKey}
+          />
           <CommentsDialog postId={postId}>{children}</CommentsDialog>
         </div>
       </CardFooter>

@@ -5,16 +5,28 @@ import Image from "next/image";
 import { Book } from "lucide-react";
 import FormattedText from "../../FormattedText";
 import PostWrapper from "../shared/PostWrapper";
+import Link from "next/link";
 
-export default function Review({ review }: { review: ReviewProps }) {
+export default function Review({
+  review,
+  queryKey,
+}: {
+  review: ReviewProps;
+  queryKey: (string | number)[];
+}) {
   return (
     <PostWrapper
-      editDialog={<ReviewDialog type="edit" review={review} />}
+      editDialog={
+        <ReviewDialog type="edit" data={review} queryKey={queryKey} />
+      }
       post={review}
-      queryKey="profile-reviews"
+      queryKey={queryKey}
     >
       <div className="flex items-center gap-2">
-        <div className="bg-dark-gray flex h-20 w-15 items-center justify-center overflow-hidden rounded-sm">
+        <Link
+          href={`/book/${review.book.id}`}
+          className="bg-dark-gray flex h-20 w-15 items-center justify-center overflow-hidden rounded-sm"
+        >
           {review.book.image ? (
             <Image
               src={`${process.env.NEXT_PUBLIC_SERVER_URL}${review.book.image}`}
@@ -26,13 +38,16 @@ export default function Review({ review }: { review: ReviewProps }) {
           ) : (
             <Book className="size-6" />
           )}
-        </div>
+        </Link>
         <div className="flex flex-col gap-0.5">
           <h1 className="text-lg">{review.title}</h1>
           <h2 className="flex items-center gap-2">
-            <span className="font-yoc text-lg font-medium text-gray-300">
+            <Link
+              href={`/book/${review.book.id}`}
+              className="font-yoc hover:text-yoc-yellow-light text-lg font-medium text-gray-300"
+            >
               {review.book.title}
-            </span>{" "}
+            </Link>{" "}
             <Rate rate={review.rate} />
           </h2>
         </div>

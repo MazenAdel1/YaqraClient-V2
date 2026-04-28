@@ -3,4 +3,5 @@ export type PostActionsProps = {
   likeCount: number;
   isLiked: boolean;
   children: React.ReactNode;
+  queryKey: (string | number)[];
 };
