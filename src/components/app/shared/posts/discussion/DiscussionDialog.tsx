@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogClose,
@@ -17,7 +19,7 @@ import { TAGS } from "./consts";
 
 export default function DiscussionDialog({
   type,
-  discussion,
+  data: discussion,
 }: DiscussionDialogProps) {
   const { user } = useUserStore();
   const closeRef = useRef<HTMLButtonElement>(null);

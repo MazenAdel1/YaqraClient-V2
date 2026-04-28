@@ -1,5 +1,5 @@
-import { BookProps } from "@/components/app/feed/types";
-import { PostBaseProps } from "../shared/types";
+import { BookProps } from "../../types";
+import { PostBaseProps, PostDialogProps } from "../shared/types";
 
 export type ReviewProps = PostBaseProps & {
   title: string;
@@ -8,12 +8,4 @@ export type ReviewProps = PostBaseProps & {
   book: BookProps;
 };
 
-export type ReviewDialogProps =
-  | {
-      type: "add";
-      review?: never;
-    }
-  | {
-      type: "edit";
-      review: ReviewProps;
-    };
+export type ReviewDialogProps = PostDialogProps<ReviewProps>;

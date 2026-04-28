@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogClose,
@@ -14,7 +16,11 @@ import { useRef } from "react";
 import { useUserStore } from "@/providers/user-store-provider";
 import { ReviewDialogProps } from "./types";
 
-export default function ReviewDialog({ type, review }: ReviewDialogProps) {
+export default function ReviewDialog({
+  type,
+  data: review,
+  queryKey,
+}: ReviewDialogProps) {
   const { user } = useUserStore();
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -38,13 +44,12 @@ export default function ReviewDialog({ type, review }: ReviewDialogProps) {
         queryParam: "bookTitle",
         optionValueKey: "id",
         optionLabelKey: "title",
-        defaultOption:
-          type === "edit" && review?.book
-            ? {
-                value: review.book.id,
-                label: review.book.title,
-              }
-            : undefined,
+        defaultOption: review?.book
+          ? {
+              value: review.book.id,
+              label: review.book.title,
+            }
+          : undefined,
         minQueryLength: 2,
         noResultsText: "لا توجد كتب مطابقة",
       },
@@ -77,7 +82,9 @@ export default function ReviewDialog({ type, review }: ReviewDialogProps) {
           Rate: review?.rate,
           BookId: review?.book.id,
         }
-      : undefined;
+      : review?.book && {
+          BookId: review.book.id,
+        };
 
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
@@ -86,7 +93,7 @@ export default function ReviewDialog({ type, review }: ReviewDialogProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["profile-reviews"],
+        queryKey,
       });
 
       closeRef.current?.click();

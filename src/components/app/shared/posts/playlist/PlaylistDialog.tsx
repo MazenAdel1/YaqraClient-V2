@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogClose,
@@ -16,7 +18,7 @@ import { PlaylistDialogProps } from "./types";
 
 export default function PlaylistDialog({
   type,
-  playlist,
+  data: playlist,
 }: PlaylistDialogProps) {
   const { user } = useUserStore();
   const closeRef = useRef<HTMLButtonElement>(null);

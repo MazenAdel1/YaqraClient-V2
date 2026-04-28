@@ -1,5 +1,5 @@
-import { BookProps } from "@/components/app/feed/types";
-import { PostBaseProps } from "../shared/types";
+import { BookProps } from "../../types";
+import { PostBaseProps, PostDialogProps } from "../shared/types";
 
 export type PlaylistProps = PostBaseProps & {
   title: string;
@@ -7,12 +7,4 @@ export type PlaylistProps = PostBaseProps & {
   books: BookProps[];
 };
 
-export type PlaylistDialogProps =
-  | {
-      type: "add";
-      playlist?: never;
-    }
-  | {
-      type: "edit";
-      playlist: PlaylistProps;
-    };
+export type PlaylistDialogProps = PostDialogProps<PlaylistProps>;

@@ -1,5 +1,5 @@
-import { BookProps } from "@/components/app/feed/types";
-import { PostBaseProps } from "../shared/types";
+import { BookProps } from "../../types";
+import { PostBaseProps, PostDialogProps } from "../shared/types";
 
 export type DiscussionTag = "0" | "1" | "2" | "Discussion" | "Article" | "News";
 
@@ -10,12 +10,4 @@ export type DiscussionProps = PostBaseProps & {
   books: BookProps[];
 };
 
-export type DiscussionDialogProps =
-  | {
-      type: "add";
-      discussion?: never;
-    }
-  | {
-      type: "edit";
-      discussion: DiscussionProps;
-    };
+export type DiscussionDialogProps = PostDialogProps<DiscussionProps>;
