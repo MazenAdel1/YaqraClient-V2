@@ -1,7 +1,7 @@
 "use client";
 
 import { axios } from "@/lib/axios";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useUserStore } from "@/providers/user-store-provider";
 import {
@@ -9,6 +9,10 @@ import {
   Review,
   ReviewDialog,
 } from "@/components/app/shared/posts/review";
+import { InfiniteQueryResponse } from "@/components/shared";
+import { useCallback, useMemo } from "react";
+
+const QUERY_KEY = "profile-reviews";
 
 export default function Reviews({ userId }: { userId: string }) {
   const { user: theCurrentUser } = useUserStore();
@@ -17,20 +21,52 @@ export default function Reviews({ userId }: { userId: string }) {
     data: reviews,
     isLoading,
     isError,
-  } = useQuery<ReviewProps[]>({
-    queryKey: ["profile-reviews", userId, 1],
-    queryFn: async () => {
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery<InfiniteQueryResponse<ReviewProps>>({
+    queryKey: [QUERY_KEY, userId],
+    queryFn: async ({ pageParam }) => {
       const { data } = await axios.get("/community/userReviews", {
         params: {
           userId,
-          page: 1,
+          page: pageParam,
         },
       });
 
-      return data.result.data;
+      return data.result;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const hasMore = lastPage.pageNumber < lastPage.totalPages;
+      return hasMore ? lastPage.pageNumber + 1 : null;
     },
     enabled: Boolean(userId),
   });
+
+  const reviewsData = useMemo(
+    () => reviews?.pages.flatMap((page) => page.data) ?? [],
+    [reviews],
+  );
+
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries[0]?.isIntersecting) return;
+          if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+        },
+        { rootMargin: "200px 0px", threshold: 0 },
+      );
+
+      observer.observe(node);
+
+      return () => observer.disconnect();
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
 
   if (isLoading) {
     return (
@@ -45,14 +81,24 @@ export default function Reviews({ userId }: { userId: string }) {
   }
 
   return (
-    <section className="flex flex-col gap-2">
-      {theCurrentUser?.id === userId && <ReviewDialog type="add" />}
-      {reviews && reviews.length > 0 ? (
-        reviews.map((review: ReviewProps) => (
-          <Review key={review.id} review={review} />
+    <section className="flex flex-col gap-12">
+      {theCurrentUser?.id === userId && (
+        <ReviewDialog type="add" queryKey={[QUERY_KEY, userId]} />
+      )}
+      {reviewsData.length > 0 ? (
+        reviewsData.map((review) => (
+          <Review
+            key={review.id}
+            review={review}
+            queryKey={[QUERY_KEY, userId]}
+          />
         ))
       ) : (
         <p className="text-center text-gray-300">لا توجد مراجعات بعد</p>
+      )}
+      <div ref={sentinelRef} className="h-px w-full" />
+      {isFetchingNextPage && (
+        <Loader2 className="mx-auto size-8 animate-spin" />
       )}
     </section>
   );
