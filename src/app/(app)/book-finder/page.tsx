@@ -1,5 +1,5 @@
 import { BookFinderSearch } from "@/components/app/book-finder";
-import BookCard from "@/components/app/book-finder/book-card/BookCard";
+import BookCard from "@/components/app/shared/book-card/BookCard";
 import { ApiBookProps } from "@/components/app/shared";
 import { axios } from "@/lib/axios";
 
@@ -46,12 +46,7 @@ export default async function page({
       <BookFinderSearch />
       <section className="container grid grid-cols-1 gap-3 px-2 md:grid-cols-2 md:gap-4 md:px-0 lg:w-[55%] lg:gap-5 xl:w-[65%] xl:grid-cols-3">
         {data.result.data?.map((book: ApiBookProps) => (
-          <BookCard
-            {...book}
-            author={book.authorsDto[0]}
-            genres={book.genresDto}
-            key={book.id}
-          />
+          <BookCard key={book.id} {...book} />
         ))}
       </section>
     </>
