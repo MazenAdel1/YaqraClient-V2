@@ -164,12 +164,14 @@ export default function Form<S extends AnyObjectSchema>({
                     max={input.max ?? 100}
                     step={input.step ?? 1}
                     value={
-                      typeof field.value === "number" ? field.value : (input.min ?? 0)
+                      typeof field.value === "number"
+                        ? field.value
+                        : (input.min ?? 0)
                     }
                     onChange={(e) => field.onChange(Number(e.target.value))}
                     aria-label={input.label}
                     aria-invalid={fieldState.invalid}
-                    className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary"
+                    className="bg-muted accent-primary h-1.5 w-full cursor-pointer appearance-none rounded-full"
                   />
                   <span className="text-muted-foreground text-xs">
                     {field.value as number}
