@@ -4,6 +4,7 @@ export type ApiBookProps = {
   image?: string | null;
   rate?: number;
   numberOfPages?: number;
+  description?: string;
   authorsDto: {
     id: number;
     name: string;
@@ -23,6 +24,7 @@ export type BookProps = {
   image?: string | null;
   rate?: number;
   numberOfPages?: number;
+  description?: string;
   author?: {
     id: number;
     name: string;
