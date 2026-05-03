@@ -1,75 +1,123 @@
 "use client";
 
-import { Form, FormProps } from "@/components/shared/form";
-import { Button } from "@/components/ui/button";
+import { axios } from "@/lib/axios";
+import { useQuery } from "@tanstack/react-query";
+import { useDebounce } from "@/hooks";
+import { useState, useRef, useEffect } from "react";
+import { BookIcon, Loader2, SearchIcon } from "lucide-react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Activity, useLayoutEffect, useRef, useState } from "react";
-import { FINDER_DEFAULT_VALUES, FINDER_INPUTS, FINDER_SCHEMA } from "./consts";
-import { Filter, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { BookProps } from "../shared";
 
 export default function BookFinderSearch() {
-  const [isOpen, setIsOpen] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const minLength = 2;
+  const canSearch = query.trim().length >= minLength;
+  const debouncedQuery = useDebounce(query, 300) as string;
 
-  const onSubmit: FormProps<typeof FINDER_SCHEMA>["onSubmit"] = (data) => {
-    const q = new URLSearchParams();
-    data.AuthorIds.forEach((id) => q.append("AuthorIds", String(id)));
-    data.GenreIds.forEach((id) => q.append("GenreIds", String(id)));
-    if (data.MinimumRate > 0) {
-      q.append("MinimumRate", data.MinimumRate.toString());
-    }
-    if (q.toString()) router.push(`?${q.toString()}`);
-  };
+  const { data: results = [], isFetching } = useQuery<BookProps[]>({
+    queryKey: ["book-finder-search", debouncedQuery.trim().toLowerCase()],
+    queryFn: async () => {
+      const { data } = await axios.get("/book/title", {
+        params: { bookTitle: debouncedQuery },
+      });
+      const items = data?.result?.data ?? data?.result ?? [];
+      return items;
+    },
+    enabled: canSearch,
+    staleTime: 60_000,
+  });
 
-  useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsOpen(typeof window !== "undefined" && window.innerWidth >= 1024);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const showDropdown = open && query.trim().length > 0;
+
   return (
-    <>
-      <aside
-        className={cn(
-          "container flex w-full flex-col gap-2 lg:fixed lg:right-2 lg:mb-0 lg:w-[20%] lg:gap-4 xl:w-[15%]",
-          isOpen && "mb-10",
-        )}
-      >
-        <Button
-          variant={"secondary"}
-          className="mb-4 lg:hidden"
-          size={"icon-sm"}
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          {isOpen ? <X className="size-4" /> : <Filter className="size-4" />}
-        </Button>
-        <Activity mode={isOpen ? "visible" : "hidden"}>
-          <Form
-            schema={FINDER_SCHEMA}
-            inputs={FINDER_INPUTS}
-            onSubmit={onSubmit}
-            submitLabel="البحث"
-            className="w-full flex-row flex-wrap items-end *:flex-1 lg:flex-col lg:*:w-full [&_button]:flex-none [&_input[type='range']]:min-w-40"
-            defaultValues={FINDER_DEFAULT_VALUES}
-            ref={formRef}
-          />
-          {searchParams.size > 0 && (
-            <Button
-              nativeButton={false}
-              variant="destructive"
-              render={
-                <Link href="/book-finder" className={"w-full"}>
-                  مسح
-                </Link>
-              }
-            />
+    <div ref={containerRef} className="relative w-full max-w-xs">
+      <InputGroup>
+        <InputGroupAddon>
+          {isFetching ? (
+            <Loader2 className="text-muted-foreground size-4 animate-spin" />
+          ) : (
+            <SearchIcon className="size-4" />
           )}
-        </Activity>
-      </aside>
-    </>
+        </InputGroupAddon>
+        <InputGroupInput
+          placeholder="البحث عن كتاب"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+        />
+      </InputGroup>
+
+      {showDropdown && (
+        <div className="border-border bg-popover absolute z-50 mt-1 w-full rounded-md border shadow-md">
+          {!canSearch ? (
+            <p className="text-muted-foreground px-3 py-2 text-sm">
+              اكتب حرفين على الأقل للبحث
+            </p>
+          ) : isFetching ? (
+            <div className="text-muted-foreground flex items-center gap-2 px-3 py-2 text-sm">
+              <Loader2 className="size-4 animate-spin" />
+              جاري البحث...
+            </div>
+          ) : results.length === 0 ? (
+            <p className="text-muted-foreground px-3 py-2 text-sm">
+              لا توجد نتائج
+            </p>
+          ) : (
+            <ul className="max-h-60 overflow-y-auto py-1">
+              {results.map((book) => (
+                <li key={book.id}>
+                  <Link
+                    href={`/book/${book.id}`}
+                    className="hover:bg-accent hover:text-accent-foreground flex items-center gap-2 px-3 py-2 text-sm transition-colors"
+                    onClick={() => {
+                      setOpen(false);
+                    }}
+                  >
+                    {book.image ? (
+                      <Image
+                        width={20}
+                        height={30}
+                        alt={book.title}
+                        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${book.image}`}
+                        className="rounded-xs"
+                      />
+                    ) : (
+                      <BookIcon className="size-5" />
+                    )}
+                    <p>{book.title}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
