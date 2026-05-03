@@ -67,7 +67,7 @@ export default function BookReviews({
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
+      <div className="grid-layout-3">
         {reviewsData.map((review) => (
           <Review
             key={review.id}

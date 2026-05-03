@@ -56,7 +56,7 @@ export default function AuthorBooks({
         <h2 className="font-yoc text-lg sm:text-xl lg:text-2xl">الكتب</h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
+      <div className="grid-layout-3">
         {booksData.map((book) => (
           <BookCard key={book.id} {...book} />
         ))}
