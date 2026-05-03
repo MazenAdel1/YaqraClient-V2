@@ -1,7 +1,12 @@
-import { BookFinderSearch } from "@/components/app/book-finder";
+import {
+  BookFinderFilter,
+  BookFinderPagination,
+  BookFinderSearch,
+} from "@/components/app/book-finder";
 import BookCard from "@/components/app/shared/book-card/BookCard";
 import { ApiBookProps } from "@/components/app/shared";
 import { axios } from "@/lib/axios";
+import { redirect } from "next/navigation";
 
 export default async function page({
   searchParams,
@@ -10,11 +15,16 @@ export default async function page({
     AuthorIds?: string | string[];
     GenreIds?: string | string[];
     MinimumRate?: string;
+    page?: string;
   }>;
 }) {
-  const { AuthorIds, GenreIds, MinimumRate } = await searchParams;
+  const { AuthorIds, GenreIds, MinimumRate, page } = await searchParams;
+
+  if (page && (Number(page) < 1 || !Number.isInteger(Number(page))))
+    return redirect("/book-finder");
 
   let query = "";
+
   if (AuthorIds) {
     if (Array.isArray(AuthorIds)) {
       AuthorIds.forEach((id, index) => {
@@ -39,16 +49,22 @@ export default async function page({
     query += `&MinimumRate=${MinimumRate}`;
   }
 
-  const { data } = await axios.get(`/book/find?${query}`);
+  const { data } = await axios.get(`/book/find?${query}&page=${page || 1}`);
 
   return (
     <>
-      <BookFinderSearch />
-      <section className="container grid grid-cols-1 gap-3 px-2 md:grid-cols-2 md:gap-4 md:px-0 lg:w-[55%] lg:gap-5 xl:w-[65%] xl:grid-cols-3">
-        {data.result.data?.map((book: ApiBookProps) => (
-          <BookCard key={book.id} {...book} />
-        ))}
-      </section>
+      <BookFinderFilter />
+      <div className="container flex flex-col gap-5 px-2 lg:w-[55%] xl:w-[65%]">
+        <div className="flex items-center gap-3 lg:gap-5">
+          <BookFinderSearch />
+          <BookFinderPagination data={data.result} page={page} query={query} />
+        </div>
+        <section className="grid-layout-3">
+          {data.result.data?.map((book: ApiBookProps) => (
+            <BookCard key={book.id} {...book} />
+          ))}
+        </section>
+      </div>
     </>
   );
 }
