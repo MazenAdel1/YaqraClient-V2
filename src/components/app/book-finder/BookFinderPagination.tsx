@@ -3,16 +3,20 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { BookProps } from "../shared";
+import { Route } from "next";
 
 export default function BookFinderPagination({
   page,
   data,
   query,
+  basePath,
 }: {
   page?: string;
-  data: InfiniteQueryResponse<BookProps>;
+  data?: InfiniteQueryResponse<BookProps>;
   query: string;
+  basePath: string;
 }) {
+  if (!data) return null;
   const hasNextPage = data.pageNumber < data.totalPages;
 
   return (
@@ -23,7 +27,11 @@ export default function BookFinderPagination({
           variant={"outline"}
           nativeButton={false}
           render={
-            <Link href={`/book-finder?${query}&page=${data.pageNumber - 1}`}>
+            <Link
+              href={
+                `${basePath}${query ? `?${query}&` : "?"}page=${data.pageNumber - 1}` as Route
+              }
+            >
               <ArrowRight className="size-3.5" />
             </Link>
           }
@@ -44,7 +52,11 @@ export default function BookFinderPagination({
           variant="outline"
           nativeButton={false}
           render={
-            <Link href={`/book-finder?${query}&page=${data.pageNumber + 1}`}>
+            <Link
+              href={
+                `${basePath}${query ? `?${query}&` : "?"}page=${data.pageNumber + 1}` as Route
+              }
+            >
               <ArrowLeft className="size-3.5" />
             </Link>
           }
