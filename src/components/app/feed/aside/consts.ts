@@ -2,6 +2,7 @@ import {
   Calendar,
   Clock,
   Library,
+  Lightbulb,
   LucideIcon,
   Search,
   Star,
@@ -30,17 +31,22 @@ export const ASIDE_LINKS: {
     },
     {
       name: "الرائج",
-      href: "/",
+      href: "/books?type=trending",
       icon: TrendingUp,
     },
     {
+      name: "مقترحات",
+      href: "/books?type=recommendations",
+      icon: Lightbulb,
+    },
+    {
       name: "الأحدث",
-      href: "/",
+      href: "/books?type=recent",
       icon: Clock,
     },
     {
       name: "القادم",
-      href: "/",
+      href: "/books?type=upcoming",
       icon: Calendar,
     },
   ],
