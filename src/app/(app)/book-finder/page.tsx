@@ -57,7 +57,12 @@ export default async function page({
       <div className="container flex flex-col gap-5 px-2 lg:w-[55%] xl:w-[65%]">
         <div className="flex items-center gap-3 lg:gap-5">
           <BookFinderSearch />
-          <BookFinderPagination data={data.result} page={page} query={query} />
+          <BookFinderPagination
+            data={data.result}
+            page={page}
+            query={query}
+            basePath="/book-finder"
+          />
         </div>
         <section className="grid-layout-3">
           {data.result.data?.map((book: ApiBookProps) => (
