@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { TAGS } from "./consts";
 import FormattedText from "../../FormattedText";
 import PostWrapper from "../shared/PostWrapper";
+import Link from "next/link";
 
 export default function Discussion({
   discussion,
@@ -28,13 +29,14 @@ export default function Discussion({
         <h1 className="font-yoc text-xl font-semibold">{discussion.title}</h1>
         <div className="font-yoc flex gap-1">
           {discussion.books.slice(0, 3).map((book) => (
-            <div
+            <Link
               key={book.id}
+              href={`/book/${book.id}`}
               className="bg-dark-gray flex items-center gap-2 rounded-md p-1.5 text-gray-200"
             >
               <Book className="size-4" />
               {book.title}
-            </div>
+            </Link>
           ))}
           {discussion.books.length > 3 && (
             <div className="bg-dark-gray flex h-20 w-15 items-center justify-center rounded-sm text-sm text-gray-300">
