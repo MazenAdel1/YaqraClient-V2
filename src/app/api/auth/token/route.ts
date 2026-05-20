@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const TOKEN_KEY = "token";
+const REFRESH_TOKEN_KEY = "refreshToken";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(TOKEN_KEY)?.value ?? null;
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE() {
   const response = NextResponse.json({ ok: true });
   response.cookies.delete(TOKEN_KEY);
+  response.cookies.delete(REFRESH_TOKEN_KEY);
 
   return response;
 }
