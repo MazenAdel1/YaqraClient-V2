@@ -10,8 +10,14 @@ import { GoalProps } from "./types";
 import GoalDialog from "./GoalDialog";
 import DeleteGoal from "./DeleteGoal";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Calendar, Target } from "lucide-react";
+import { BookOpen, Calendar, EllipsisIcon, Target } from "lucide-react";
 import { formatDate, FormattedText } from "@/components/app/shared";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function Goal({ goal }: { goal: GoalProps }) {
   const { user: theCurrentUser } = useUserStore();
@@ -48,8 +54,19 @@ export default function Goal({ goal }: { goal: GoalProps }) {
 
         {theCurrentUser?.id === goal.userId && (
           <CardAction className="border-light-gray flex gap-1 rounded-md border">
-            <GoalDialog type="edit" goal={goal} />
-            <DeleteGoal goalId={goal.id} />
+            <DropdownMenu modal={true}>
+              <DropdownMenuTrigger
+                render={
+                  <Button variant={"outline"}>
+                    <EllipsisIcon />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent className={"flex flex-col gap-1 *:w-full"}>
+                <GoalDialog type="edit" goal={goal} />
+                <DeleteGoal goalId={goal.id} />
+              </DropdownMenuContent>
+            </DropdownMenu>
           </CardAction>
         )}
       </CardHeader>
