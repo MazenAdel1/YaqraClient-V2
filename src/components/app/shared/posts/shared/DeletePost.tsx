@@ -34,7 +34,7 @@ export default function DeletePost({
     <Dialog>
       <DialogTrigger
         render={
-          <Button variant="ghost" size="icon">
+          <Button variant="destructive" size="icon">
             <Trash className="size-4" />
           </Button>
         }

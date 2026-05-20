@@ -99,7 +99,7 @@ export default function ImagePicker({
         </Button>
         <Button
           type="button"
-          variant="ghost"
+          variant="destructive"
           className="flex-1"
           onClick={handleClear}
           disabled={disabled || !value}
