@@ -42,7 +42,6 @@ export default function AuthorBooks({
       pageParams: [1],
     },
     initialPageParam: 1,
-    enabled: true,
   });
 
   const booksData = useMemo(
