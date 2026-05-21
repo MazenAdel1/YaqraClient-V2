@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ASIDE_LINKS } from "./consts";
 import { Button } from "@/components/ui/button";
+import CommunityLinks from "./CommunityLinks";
 
 export default function Aside() {
   return (
@@ -25,21 +26,7 @@ export default function Aside() {
       </div>
       <div className="flex flex-col gap-2">
         <h3 className="px-2.5 font-bold">المجتمع</h3>
-        <div className="flex flex-col gap-1.5 rounded-lg">
-          {ASIDE_LINKS.community.map(({ name, href, icon: Icon }) => (
-            <Button
-              key={name}
-              nativeButton={false}
-              variant={"secondary"}
-              className={"justify-start gap-2"}
-              render={
-                <Link href={href}>
-                  <Icon className="size-4" /> {name}
-                </Link>
-              }
-            />
-          ))}
-        </div>
+        <CommunityLinks />
       </div>
     </aside>
   );

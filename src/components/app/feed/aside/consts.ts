@@ -53,17 +53,17 @@ export const ASIDE_LINKS: {
   community: [
     {
       name: "مراجعات",
-      href: "/",
+      href: "/community?type=reviews",
       icon: Star,
     },
     {
       name: "مناقشات",
-      href: "/",
+      href: "/community?type=discussions",
       icon: Users,
     },
     {
       name: "قوائم الكتب",
-      href: "/",
+      href: "/community?type=playlists",
       icon: Library,
     },
   ],
