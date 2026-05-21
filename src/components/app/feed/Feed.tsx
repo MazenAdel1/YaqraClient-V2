@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  TimelinePostProps,
-  SuggestedBooks,
-  Aside,
-} from "@/components/app/feed";
+import { TimelinePostProps, SuggestedBooks } from "@/components/app/feed";
 import { BookProps } from "@/components/app/shared";
 import {
   Discussion,
@@ -120,36 +116,33 @@ export default function Feed({
   }, [posts?.pages, theCurrentUser?.id]);
 
   return (
-    <>
-      <Aside />
-      <div className="container flex flex-col gap-12 lg:max-w-2xl">
-        <div className="flex w-full gap-2 *:flex-1">
-          <Button
-            variant={isFollowings ? "outline" : "default"}
-            onClick={() => setIsFollowings(false)}
-          >
-            الافتراضي
-          </Button>
-          <Button
-            variant={isFollowings ? "default" : "outline"}
-            onClick={() => setIsFollowings(true)}
-          >
-            المتابَعين
-          </Button>
-        </div>
-
-        {isLoading ? (
-          <Loader2 className="mx-auto size-8 animate-spin" />
-        ) : (
-          <section className="flex flex-col gap-10">{RenderPosts}</section>
-        )}
-
-        <div ref={sentinelRef} className="h-px w-full" />
-
-        {isFetchingNextPage && (
-          <Loader2 className="mx-auto size-8 animate-spin" />
-        )}
+    <div className="container flex flex-col gap-12 lg:max-w-2xl">
+      <div className="flex w-full gap-2 *:flex-1">
+        <Button
+          variant={isFollowings ? "outline" : "default"}
+          onClick={() => setIsFollowings(false)}
+        >
+          الافتراضي
+        </Button>
+        <Button
+          variant={isFollowings ? "default" : "outline"}
+          onClick={() => setIsFollowings(true)}
+        >
+          المتابَعين
+        </Button>
       </div>
-    </>
+
+      {isLoading ? (
+        <Loader2 className="mx-auto size-8 animate-spin" />
+      ) : (
+        <section className="flex flex-col gap-10">{RenderPosts}</section>
+      )}
+
+      <div ref={sentinelRef} className="h-px w-full" />
+
+      {isFetchingNextPage && (
+        <Loader2 className="mx-auto size-8 animate-spin" />
+      )}
+    </div>
   );
 }
