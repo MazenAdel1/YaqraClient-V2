@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 import Link from "next/link";
-import { ASIDE_LINKS } from "@/components/app/feed/aside";
+import { ASIDE_LINKS } from "@/components/app/feed-community/shared";
 
 export default function MobileMenu() {
   return (

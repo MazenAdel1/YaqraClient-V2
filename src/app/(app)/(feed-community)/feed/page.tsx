@@ -1,5 +1,5 @@
-import { TimelinePostProps } from "@/components/app/feed";
-import { Feed } from "@/components/app/feed";
+import { TimelinePostProps } from "@/components/app/feed-community/feed";
+import { Feed } from "@/components/app/feed-community/feed";
 import { axios } from "@/lib/axios";
 
 export default async function Page() {

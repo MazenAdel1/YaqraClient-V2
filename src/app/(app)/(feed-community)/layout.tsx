@@ -1,4 +1,4 @@
-import { Aside } from "@/components/app/feed";
+import { Aside } from "@/components/app/feed-community/shared";
 
 export default async function layout({
   children,

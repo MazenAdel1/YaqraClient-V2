@@ -1,7 +1,7 @@
 import { Book } from "lucide-react";
 import Image from "next/image";
-import Rate from "../shared/posts/review/Rate";
-import { BookProps } from "../shared";
+import Rate from "../../shared/posts/review/Rate";
+import { BookProps } from "../../shared";
 
 export default function SuggestedBooks({ books }: { books: BookProps[] }) {
   return (

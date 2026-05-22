@@ -1,6 +1,9 @@
 "use client";
 
-import { TimelinePostProps, SuggestedBooks } from "@/components/app/feed";
+import {
+  TimelinePostProps,
+  SuggestedBooks,
+} from "@/components/app/feed-community/feed";
 import { BookProps } from "@/components/app/shared";
 import {
   Discussion,

@@ -1,6 +1,6 @@
-import { ReviewProps } from "../shared/posts/review";
-import { DiscussionProps } from "../shared/posts/discussion";
-import { PlaylistProps } from "../shared/posts/playlist";
+import { ReviewProps } from "../../shared/posts/review";
+import { DiscussionProps } from "../../shared/posts/discussion";
+import { PlaylistProps } from "../../shared/posts/playlist";
 
 export type PostType = "reviews" | "discussions" | "playlists";
 
