@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ASIDE_LINKS } from "./consts";
 import { Button } from "@/components/ui/button";
 import CommunityLinks from "./CommunityLinks";
+import { Suspense } from "react";
 
 export default function Aside() {
   return (
@@ -26,7 +27,9 @@ export default function Aside() {
       </div>
       <div className="flex flex-col gap-2">
         <h3 className="px-2.5 font-bold">المجتمع</h3>
-        <CommunityLinks />
+        <Suspense fallback={null}>
+          <CommunityLinks />
+        </Suspense>
       </div>
     </aside>
   );
