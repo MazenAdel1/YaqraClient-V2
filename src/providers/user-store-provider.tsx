@@ -43,7 +43,7 @@ export const UserStoreProvider = ({ children }: UserStoreProviderProps) => {
     await clearAuthToken();
     setUser(null);
 
-    if (pathname !== "/login") {
+    if (pathname !== "/login" && pathname !== "/register") {
       router.replace("/login");
     }
   }, [pathname, router]);
