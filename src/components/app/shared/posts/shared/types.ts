@@ -8,6 +8,8 @@ export type DeletePostProps = {
   queryKey: (string | number)[];
 };
 
+export type PostType = "Review" | "DiscussionArticleNews" | "Playlist";
+
 export type PostBaseProps = {
   id: number;
   userId: string;
@@ -15,7 +17,7 @@ export type PostBaseProps = {
   createdDate: string;
   likeCount: number;
   isLiked: boolean;
-  type?: "Review" | "DiscussionArticleNews" | "Playlist";
+  type: PostType;
 };
 
 export type PostWrapperProps = {
