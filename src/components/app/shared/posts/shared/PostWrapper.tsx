@@ -1,3 +1,7 @@
+"use client";
+
+import * as React from "react";
+import { useState } from "react";
 import {
   Card,
   CardAction,
@@ -10,12 +14,13 @@ import { timeAgo } from "@/lib/utils";
 import DeletePost from "./DeletePost";
 import { useUserStore } from "@/providers/user-store-provider";
 import { PostWrapperProps } from "./types";
-import { EllipsisIcon } from "lucide-react";
+import { Edit, Trash, EllipsisIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { Button } from "@/components/ui/button";
 
 export default function PostWrapper({
@@ -25,6 +30,8 @@ export default function PostWrapper({
   queryKey,
 }: PostWrapperProps) {
   const { user: theCurrentUser } = useUserStore();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   return (
     <Card>
@@ -53,11 +60,23 @@ export default function PostWrapper({
                   }
                 />
                 <DropdownMenuContent className={"flex flex-col gap-1 *:w-full"}>
-                  {editDialog}
-                  <DeletePost
-                    postId={post.id}
-                    queryKey={queryKey}
-                    title="هل أنت متأكد من حذف هذا المنشور"
+                  <MenuPrimitive.Item
+                    nativeButton={true}
+                    render={
+                      <Button variant="ghost" size="icon">
+                        <Edit className="size-4" />
+                      </Button>
+                    }
+                    onClick={() => setIsEditDialogOpen(true)}
+                  />
+                  <MenuPrimitive.Item
+                    nativeButton={true}
+                    render={
+                      <Button variant="destructive" size="icon">
+                        <Trash className="size-4" />
+                      </Button>
+                    }
+                    onClick={() => setIsDeleteDialogOpen(true)}
                   />
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -68,6 +87,27 @@ export default function PostWrapper({
           {children}
         </CardContent>
       </PostActionsWrapper>
+
+      {/* Render Dialogs outside of DropdownMenu */}
+      {editDialog &&
+        React.cloneElement(
+          editDialog as React.ReactElement<{
+            open?: boolean;
+            onOpenChange?: (open: boolean) => void;
+          }>,
+          {
+            open: isEditDialogOpen,
+            onOpenChange: setIsEditDialogOpen,
+          },
+        )}
+
+      <DeletePost
+        postId={post.id}
+        queryKey={queryKey}
+        title="هل أنت متأكد من حذف هذا المنشور"
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      />
     </Card>
   );
 }

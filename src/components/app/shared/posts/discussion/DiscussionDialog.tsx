@@ -12,17 +12,27 @@ import { Form, FormProps } from "@/components/shared/form";
 import z from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axios } from "@/lib/axios";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useUserStore } from "@/providers/user-store-provider";
 import { DiscussionDialogProps } from "./types";
 import { TAGS } from "./consts";
 
 export default function DiscussionDialog({
   type,
+  queryKey,
   data: discussion,
-}: DiscussionDialogProps) {
+  open,
+  onOpenChange,
+}: DiscussionDialogProps & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const { user } = useUserStore();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [localOpen, setLocalOpen] = useState(false);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isOpen = isControlled ? open : localOpen;
+  const setIsOpen = isControlled ? onOpenChange : setLocalOpen;
 
   const SCHEMA = z.object({
     ...(type === "edit" ? { Id: z.number().default(discussion.id) } : {}),
@@ -111,10 +121,11 @@ export default function DiscussionDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["profile-discussions"],
+        queryKey,
       });
 
       closeRef.current?.click();
+      setIsOpen(false);
     },
   });
 
@@ -123,21 +134,23 @@ export default function DiscussionDialog({
   };
 
   return (
-    <Dialog>
-      <DialogTrigger
-        render={
-          type === "edit" ? (
-            <Button variant="ghost" size="icon">
-              <Edit className="size-4" />
-            </Button>
-          ) : (
-            <Button className="w-fit">
-              إضافة نقاش
-              <PlusCircle className="size-3.5" />
-            </Button>
-          )
-        }
-      />
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {!isControlled && (
+        <DialogTrigger
+          render={
+            type === "edit" ? (
+              <Button variant="ghost" size="icon">
+                <Edit className="size-4" />
+              </Button>
+            ) : (
+              <Button className="w-fit">
+                إضافة نقاش
+                <PlusCircle className="size-3.5" />
+              </Button>
+            )
+          }
+        />
+      )}
       <DialogContent>
         <DialogClose className="hidden" ref={closeRef} />
         <Form

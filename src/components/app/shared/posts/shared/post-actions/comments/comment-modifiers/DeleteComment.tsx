@@ -9,15 +9,32 @@ import { Loader2, Trash } from "lucide-react";
 import { CommentProps } from "../types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axios } from "@/lib/axios";
+import { useState } from "react";
 
-export default function DeleteComment({ comment }: { comment: CommentProps }) {
+export default function DeleteComment({
+  comment,
+  open,
+  onOpenChange,
+}: {
+  comment: CommentProps;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [localOpen, setLocalOpen] = useState(false);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isOpen = isControlled ? open : localOpen;
+  const setIsOpen = isControlled ? onOpenChange : setLocalOpen;
+
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
       await axios.delete(`/community/comment?commentId=${comment.id}`);
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", comment.postId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", comment.postId],
+      });
+      setIsOpen(false);
     },
   });
 
@@ -25,14 +42,16 @@ export default function DeleteComment({ comment }: { comment: CommentProps }) {
     await mutateAsync();
   };
   return (
-    <Dialog>
-      <DialogTrigger
-        render={
-          <Button variant={"ghost"} size={"icon"}>
-            <Trash className="size-4" />
-          </Button>
-        }
-      />
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {!isControlled && (
+        <DialogTrigger
+          render={
+            <Button variant={"destructive"} size={"icon"}>
+              <Trash className="size-4" />
+            </Button>
+          }
+        />
+      )}
 
       <DialogContent>
         <DialogTitle>حذف التعليق</DialogTitle>

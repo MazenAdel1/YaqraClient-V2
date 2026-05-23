@@ -8,8 +8,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axios } from "@/lib/axios";
 import { useState } from "react";
 
-export default function EditComment({ comment }: { comment: CommentProps }) {
-  const [open, setOpen] = useState(false);
+export default function EditComment({
+  comment,
+  open,
+  onOpenChange,
+}: {
+  comment: CommentProps;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [localOpen, setLocalOpen] = useState(false);
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isOpen = isControlled ? open : localOpen;
+  const setIsOpen = isControlled ? onOpenChange : setLocalOpen;
 
   const SCHEMA = z.object({
     commentId: z.number().min(1).default(comment.id),
@@ -37,7 +48,7 @@ export default function EditComment({ comment }: { comment: CommentProps }) {
       await queryClient.invalidateQueries({
         queryKey: ["comments", comment.postId],
       });
-      setOpen(false);
+      setIsOpen(false);
     },
   });
 
@@ -45,14 +56,16 @@ export default function EditComment({ comment }: { comment: CommentProps }) {
     await mutateAsync(data);
   };
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button variant={"ghost"} size={"icon"}>
-            <Edit className="size-4" />
-          </Button>
-        }
-      />
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {!isControlled && (
+        <DialogTrigger
+          render={
+            <Button variant={"ghost"} size={"icon"}>
+              <Edit className="size-4" />
+            </Button>
+          }
+        />
+      )}
       <DialogContent>
         <Form
           inputs={[
